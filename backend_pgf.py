@@ -19,11 +19,17 @@ def writeln(fh, line):
     fh.write(line)
     fh.write("%\n")
 
+# debug switch
+debug = rcParams.get("pgf.debug", False)
+
 # setting the default font and preamble
 # TODO: Computer Modern Unicode is not included in current latex distributions
 # the default font doesn't provide much of the symbols though :/
 fontfamily = rcParams.get("pgf.font", "CMU Serif")
 latex_preamble = rcParams.get("pgf.preamble", "")
+
+# TODO: the mathdefault macro matplotlib adds to some texts is unknown to me
+latex_preamble += "\\newcommand{\\mathdefault}[1]{#1}\n"
 
 # replace every math environment with displaystyle math
 math_search = re.compile(r"\$([^\$]+)\$")
@@ -76,11 +82,19 @@ text $math \mu$ %% force latex to load fonts now
         while xelatex.stdout.read(1) != '*':
             pass
         self.xelatex = xelatex
+        self.xelatex_stdin = codecs.getwriter("utf-8")(xelatex.stdin)
     
     def __del__(self):
         self.xelatex.terminate()
+        self.xelatex.wait()
+        try:
+            os.remove("texput.log")
+            os.remove("texput.aux")
+        except:
+            pass
 
     def get_width_height_descent(self, text, fontsize):
+        if debug: print "xelatex metrics for: %s" % text
         # TODO: no error handling here. I haven't found a reliable way to
         # set a timeout for the readline methods yet, so if something doesnt
         # match the expected result the whole process blocks or we end up with
@@ -90,8 +104,8 @@ text $math \mu$ %% force latex to load fonts now
         # change fontsize and define textbox in xelatex
         text = u"{\\fontsize{%f}{%f}\\selectfont{%s}}" % (fontsize, fontsize*1.2, text)
         text = u"\\sbox0{%s}\n" % text
-        self.xelatex.stdin.write(text)
-        self.xelatex.stdin.flush()
+        self.xelatex_stdin.write(unicode(text))
+        self.xelatex_stdin.flush()
         # wait for the next xelatex prompt
         while self.xelatex.stdout.read(1) != "*":
             pass
@@ -99,8 +113,8 @@ text $math \mu$ %% force latex to load fonts now
         
         # typeout width, height and text offset of the last textbox
         query = "\\typeout{\\the\\wd0,\\the\\ht0,\\the\\dp0}\n"
-        self.xelatex.stdin.write(query)
-        self.xelatex.stdin.flush()
+        self.xelatex_stdin.write(query)
+        self.xelatex_stdin.flush()
         # read answer from latex and advance stdout to the next prompt (*)
         answer = self.xelatex.stdout.readline().rstrip()
         while self.xelatex.stdout.read(1) != "*":
