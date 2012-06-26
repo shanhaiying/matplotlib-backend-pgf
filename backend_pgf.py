@@ -15,31 +15,51 @@ from matplotlib.text import Text
 from matplotlib.path import Path
 from matplotlib import _png, rcParams
 
-def writeln(fh, line):
-    fh.write(line)
-    fh.write("%\n")
+###############################################################################
+# settings read from rc
 
 # debug switch
 debug = rcParams.get("pgf.debug", False)
 
-# setting the default font and preamble
+# default font
 # TODO: Computer Modern Unicode is not included in current latex distributions
-# the default font doesn't provide much of the symbols though :/
+# the default font is missing alot of symbols though :/
 fontfamily = rcParams.get("pgf.font", "CMU Serif")
-latex_preamble = rcParams.get("pgf.preamble", "")
 
+# method for calculating font metrics
+use_xelatex_manager = rcParams.get("pgf.xelatexmanager", True)
+
+# latex preamble
 # TODO: the mathdefault macro matplotlib adds to some texts is unknown to me
+latex_preamble = rcParams.get("pgf.preamble", "")
 latex_preamble += "\\newcommand{\\mathdefault}[1]{#1}\n"
 
-# replace every math environment with displaystyle math
+# is math text to be displaystyled? (large symbols)
+displaymath = bool(rcParams.get("pgf.displaymath", True))
+
+###############################################################################
+
 math_search = re.compile(r"\$([^\$]+)\$")
 math_replace = lambda match: r"\(\displaystyle %s\)" % match.group(1)
 def math_to_displaystyle(text):
+    """
+    This function replaces any inline math with a inline math environment in
+    displaystyle.
+    """
     return math_search.sub(math_replace, text)
+
+# every line of a file included with \input must be terminated with %
+# if not, latex will create additional vertical spaces for some reason
+def writeln(fh, line):
+    fh.write(line)
+    fh.write("%\n")
 
 class XelatexManager:
     """
-    The XelatexManager is required for getting font metrics from Xelatex.
+    The XelatexManager opens an instance of xelatex for determining the
+    metrics of text elements. The Xelatex environment can be modified by
+    changing the main font and by adding a custom latex preamble. These
+    parameters are read from the rc settings "pgf.font" and "pgf.preamble".
     """
     
     # create header with some content, else latex will load some math fonts
@@ -97,6 +117,11 @@ text $math \mu$ %% force latex to load fonts now
             pass
 
     def get_width_height_descent(self, text, fontsize):
+        """
+        Get the width, total height and descent for a text typesetted by the
+        current Xelatex environment.
+        """
+        
         if debug: print "xelatex metrics for: %s" % text
         # TODO: no error handling here. I haven't found a reliable way to
         # set a timeout for the readline methods yet, so if something doesnt
@@ -141,7 +166,14 @@ class RendererPgf(RendererBase):
     
     xelatexManager = None
     
-    def __init__(self, figure, fh, draw_texts=True, use_xelatex_manager=False):
+    def __init__(self, figure, fh, draw_texts=True, use_xelatex_manager=True):
+        """
+        Creates a new Pgf renderer that translates any drawing instruction
+        into commands to be interpreted in a latex pgfpicture environment.
+        
+        If `draw_texts` is False, the draw_text calls are ignored and the
+        text elements must be rendered in a different way.
+        """
         RendererBase.__init__(self)
         self.dpi = figure.dpi
         self.fh = fh
@@ -233,9 +265,9 @@ class RendererPgf(RendererBase):
 
     def draw_text(self, gc, x, y, s, prop, angle, ismath=False):
         if not self.draw_texts: return
+        
         # check if the math is supposed to be displaystyled
-        if rcParams.get("pgf.displaymath", True):
-            s = math_to_displaystyle(s)
+        if displaymath: s = math_to_displaystyle(s)
         
         # TODO: the text coordinates are given in pt units, right?
         x = x*72.0/self.dpi
@@ -247,13 +279,14 @@ class RendererPgf(RendererBase):
         writeln(self.fh, r"\pgftext[left,bottom,x=%f,y=%f,rotate=%f]{%s}\n" % (x,y,angle,s))
 
     def get_text_width_height_descent(self, s, prop, ismath):
+        # TODO: except from reading the fontsize, all text properties are
+        # ignored for now.
         fontsize = prop.get_size_in_points()
         
         # check if the math is supposed to be displaystyled
-        if rcParams.get("pgf.displaymath", True):
-            s = math_to_displaystyle(s)
+        if displaymath: s = math_to_displaystyle(s)
         
-        # get text size parameters in units of pt
+        # get text metrics in units of pt
         if self.use_xelatex_manager:
             texmanager = self.get_texmanager()
             w, h, d = self.xelatexManager.get_width_height_descent(s, fontsize)
@@ -261,7 +294,7 @@ class RendererPgf(RendererBase):
             texmanager = self.get_texmanager()
             w, h, d = texmanager.get_text_width_height_descent(s, fontsize, renderer=self)
 
-        # convert sizes in displayunits
+        # convert metrics in display units
         f = self.dpi/72.0
         return w*f, h*f, d*f
 
@@ -309,9 +342,15 @@ class FigureCanvasPgf(FigureCanvasBase):
         return 'pgf'
 
     def print_pgf(self, filename, *args, **kwargs):
+        """
+        Output pgf commands for drawing the figure so it can be included and
+        rendered in latex documents.        
+        """        
+        
         w, h = self.figure.get_figwidth(), self.figure.get_figheight()
         dpi = self.figure.dpi
-
+        
+        # start a pgfpicture environment and set a bounding box
         fh = codecs.open(filename, "wt", encoding="utf-8")
         writeln(fh, r"\begingroup")
         writeln(fh, r"\begin{pgfpicture}")
@@ -320,19 +359,22 @@ class FigureCanvasPgf(FigureCanvasBase):
         writeln(fh, r"\pgfsetxvec{\pgfqpoint{%fin}{0in}}" % (1./dpi))
         writeln(fh, r"\pgfsetyvec{\pgfqpoint{0in}{%fin}}" % (1./dpi))
         
-        use_xelatex_manager = rcParams.get("pgf.xelatexmanager", True)
         # for pgf output, do not process text elements using the Renderer
         renderer = RendererPgf(self.figure, fh, draw_texts=False,
                                use_xelatex_manager=use_xelatex_manager)
         self.figure.draw(renderer)
-        # add text elements manually so we can place them according to their
-        # alignment properties
+        # manually extract text elements from the figure and draw them
+        # TODO: this wouldn't be neccessary if draw_text received Text instances as documented
         self._render_texts_pgf(fh)
-        
+
+        # end the pgfpicture environment
         writeln(fh, r"\end{pgfpicture}")
         writeln(fh, r"\endgroup")
     
     def print_pdf(self, filename, *args, **kwargs):
+        """
+        Use Xelatex to compile a Pgf generated figure to PDF.
+        """
         w, h = self.figure.get_figwidth(), self.figure.get_figheight()
         
         target = os.path.abspath(filename)
@@ -374,47 +416,44 @@ class FigureCanvasPgf(FigureCanvasBase):
         rvalign = {"top": "left", "bottom": "right", "baseline": "right", "center": ""}
         rhalign = {"left": "top", "right": "bottom", "center": ""}
         
-        # TODO: matplotlib weirdness, hide invalid tick labels
+        # TODO: matplotlib does not hide unused tick labels yet, workaround
         for tick in self.figure.findobj(matplotlib.axis.Tick):
             tick.label1.set_visible(tick.label1On)
             tick.label2.set_visible(tick.label2On)
-        # TODO: matplotlib weirdness, first legend label is "None"
+        # TODO: strange, first legend label is always "None", workaround
         for legend in self.figure.findobj(matplotlib.legend.Legend):
             labels = legend.findobj(matplotlib.text.Text)
             labels[0].set_visible(False)
-        # TODO: matplotlib weirdness, legend child labels are duplicated,
+        # TODO: strange, legend child labels are duplicated,
         # find a list of unique text objects as workaround
         texts = self.figure.findobj(match=Text, include_self=False)
         texts = list(set(texts))
-
-        displaymath = bool(rcParams.get("pgf.displaymath", True))
         
         # draw text elements
         for text in texts:
             s = text.get_text()
             if not s or not text.get_visible(): continue
         
-            if displaymath:
-                s = math_to_displaystyle(s)
+            if displaymath: s = math_to_displaystyle(s)
         
             fontsize = text.get_fontsize()
             angle = text.get_rotation()
             transform = text.get_transform()
             x, y = transform.transform_point(text.get_position())
-            # TODO: why are the text units different from path units?
+            # TODO: why are the coordinate's units different from path units?
             x *= 72./self.figure.dpi
             y *= 72./self.figure.dpi
+            # TODO: positioning behavior unknown for rotated elements, right
+            # now only the case for 90deg rotation is supported
             if angle == 90.:
                 align = rvalign[text.get_va()] + "," + rhalign[text.get_ha()]
             else:
-                # TODO: matplotlibs positioning behavior unknown for rotation
                 align = valign[text.get_va()] + "," + halign[text.get_ha()]
     
             s = ur"{\fontsize{%f}{%f}\selectfont %s}" % (fontsize, fontsize*1.2, s)
             writeln(fh, ur"\pgftext[%s,x=%f,y=%f,rotate=%f]{%s}" % (align,x,y,angle,s))
     
     def get_renderer(self):
-        use_xelatex_manager = rcParams.get("pgf.xelatexmanager", True)
         return RendererPgf(self.figure, None, draw_texts=False,
                            use_xelatex_manager=use_xelatex_manager)
 
