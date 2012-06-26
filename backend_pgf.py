@@ -255,8 +255,10 @@ class RendererPgf(RendererBase):
         fname_img = "%s-img%d.png" % (fname, self.image_counter)
         self.image_counter += 1
         # write image to a png file
-        rows, cols, buffer = im.as_rgba_str()
-        _png.write_png(buffer, cols, rows, os.path.join(path, fname_img))
+        # for some reason, the image must be flipped upside down
+        im.flipud_out()
+        rows, cols, buf = im.as_rgba_str()
+        _png.write_png(buf, cols, rows, os.path.join(path, fname_img))
         # include the png in the pgf picture
         h, w = im.get_size_out()
         h, w = h/self.dpi, w/self.dpi
