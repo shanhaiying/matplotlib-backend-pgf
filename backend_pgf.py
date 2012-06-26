@@ -390,7 +390,7 @@ class FigureCanvasPgf(FigureCanvasBase):
 %s
 \usepackage{fontspec}
 \setmainfont{%s}
-\usepackage{tikz}
+\usepackage{pgf}
 
 \begin{document}
 \centering
