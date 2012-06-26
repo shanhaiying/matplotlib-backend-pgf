@@ -1,8 +1,9 @@
 \documentclass[12pt, a4paper]{article}
 
 \usepackage{fontspec}
-
 \setmainfont{CMU Serif}
+
+\usepackage{hyperref}
 
 \usepackage{upgreek}
 
@@ -15,27 +16,28 @@
 
 \subsection*{PDF/Latex Backend Problems}
 
-When creating figures to be included in Latex documents the PDF backend is probably the first choice. The appearance of text elements within the graphs however differs from the Latex typesetting. Naturally, the figures created with the \textit{text.usetex} option look more consistent as they are rendered with Latex as well. However, Latex has no real real unicode support which limits the possibilities of using special characters in figures.
+When creating figures to be included in Latex documents the PDF backend is probably the first choice. The appearance of text elements within the graphs however differs from the Latex typesetting. Naturally, the figures created with the \textit{text.usetex} option look more consistent as they are rendered with Latex as well. But pdflatex, which is used by the backend, has no real real unicode support which limits the possibilities of using special characters in figures.
 
-The following figure contains greek unicode letters, math text and normal text. It is saved using the PDF backend:
+The following figure contains greek unicode letters, math text and normal text. It is produced using the PDF backend:
 
 \begin{figure}[h]
 \subfigure[Matplotlib PDF backend. Serif font not consistent with the Latex default font. Math-text does not fit to normal text. Greek letters are not aligned correctly.]{\includegraphics{figure-pdf.pdf}}
 \hspace{1mm}
-\subfigure[Matplotlib with Latex rendering. Consistent look in Latex documents, better looking math-text, but no real unicode support. The conversion process to PDF increases the filesize a lot. Greek letters are missing and the micro sign is replaced by a letter from the math font.]{\includegraphics{figure-pdf-usetex.pdf}}
+\subfigure[Matplotlib with Latex rendering. Consistent look in Latex documents, better looking math-text, but no real unicode support. The conversion process to PDF increases the filesize a lot. Greek letters are missing and the micro sign is replaced by an italic mu-symbol from the math font. Baseline offset of the second label is incorrect.]{\includegraphics{figure-pdf-usetex.pdf}}
 \end{figure}
 
 
 \newpage
 \subsection*{Pgf Backend with Xelatex}
 
-For real unicode support the use of Xelatex or Lualatex is mandatory. In order to use these new Latex implementations in Matplotlib, a new backend is required as the \textit{pstricks} methods for drawing the figure are not available anymore. The \textit{pgfpicture} package offers an alternative that works for Pdflatex, Xelatex and Lualatex alike. These commands can be included into Latex documents directly or be pre-compiled to PDF for inclusion. For a most consistent appearance, the font \textit{Computer Modern Unicode} available at \textit{http://sourceforge.net/projects/cm-unicode/} must be installed, since the default Latex font is missing almost all of the unicode letters. Any other installed system font will work as well though.
+For real unicode support the use of Xelatex or Lualatex is mandatory. In order to use these new Latex implementations in Matplotlib, a new backend is required as the \textit{pstricks} methods for drawing the figures are not available anymore. The \textit{pgfpicture} package offers an alternative that works for Pdflatex, Xelatex and Lualatex alike. These commands can be included in Latex documents directly (\textbackslash input) or be pre-compiled to PDF for inclusion (\textbackslash
+ includegraphics). For a most consistent appearance, the font \textit{Computer Modern Unicode} available at \url{http://sourceforge.net/projects/cm-unicode/} must be installed, since the default Latex font is most of the unicode letters. Any other installed system font will work as well though.
 
 \begin{figure}[h]
 \subfigure[Computer Modern Unicode font]{\input{figure.pgf}}
 \hspace{1mm}
 \subfigure[Main font switched to {\setmainfont{Linux Biolinum O}Biolinum}]{\setmainfont{Linux Biolinum O}\input{figure.pgf}}
-\caption{Pgf figure commands included into a Latex document. The fonts are changed without recreating the figure in matplotlib.}
+\caption{Pgf figure commands included in a Xelatex compiled document. The fonts were changed within the document without recreating the figure in matplotlib.}
 \end{figure}
 
 \end{document}
