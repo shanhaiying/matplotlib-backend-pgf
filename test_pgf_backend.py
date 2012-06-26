@@ -38,7 +38,7 @@ p.plot(x, 1-x**2, "b-.", label=ur"Math, $\int_\Omega \mu \cdot x^2\,\mathrm{d}x$
 p.plot(x, 0.2*x, "g>")
 p.xlabel(ur"$x$-axis in units of $10^3\,$µm")
 p.tight_layout(0.0)
-
 p.legend()
+
 if use_pgf: p.savefig("figure.pgf")
 p.savefig("figure.pdf")

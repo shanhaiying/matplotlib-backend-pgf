@@ -83,6 +83,9 @@ text $math \mu$ %% force latex to load fonts now
             pass
         self.xelatex = xelatex
         self.xelatex_stdin = codecs.getwriter("utf-8")(xelatex.stdin)
+        
+        # cache for strings already processed
+        self.str_cache = {}
     
     def __del__(self):
         self.xelatex.terminate()
@@ -99,18 +102,20 @@ text $math \mu$ %% force latex to load fonts now
         # set a timeout for the readline methods yet, so if something doesnt
         # match the expected result the whole process blocks or we end up with
         # returned lines we dont' understand correctly.
-        text_orig = text
         
-        # change fontsize and define textbox in xelatex
-        text = u"{\\fontsize{%f}{%f}\\selectfont{%s}}" % (fontsize, fontsize*1.2, text)
-        text = u"\\sbox0{%s}\n" % text
-        self.xelatex_stdin.write(unicode(text))
+        # change fontsize and define textbox
+        textbox = u"\\sbox0{\\fontsize{%f}{%f}\\selectfont{%s}}\n" % (fontsize, fontsize*1.2, text)
+        # check cache
+        if textbox in self.str_cache:
+            return self.str_cache[textbox]
+        
+        # send textbox to xelatex
+        self.xelatex_stdin.write(unicode(textbox))
         self.xelatex_stdin.flush()
         # wait for the next xelatex prompt
         while self.xelatex.stdout.read(1) != "*":
             pass
 
-        
         # typeout width, height and text offset of the last textbox
         query = "\\typeout{\\the\\wd0,\\the\\ht0,\\the\\dp0}\n"
         self.xelatex_stdin.write(query)
@@ -120,15 +125,16 @@ text $math \mu$ %% force latex to load fonts now
         while self.xelatex.stdout.read(1) != "*":
             pass
         
-        # parse width, height and text offset from the answer string
+        # parse metrics from the answer string
         try:
             width, height, offset = answer.split(",")
         except:
-            raise ValueError("Error processing string: %s" % text_orig)
+            raise ValueError("Error processing string: %s" % text)
         w, h, o = float(width[:-2]), float(height[:-2]), float(offset[:-2])
         
         # the hight returned from xelatex goes from base to top.
         # the hight matplotlib expects goes from bottom to top.
+        self.str_cache[textbox] = (w, h+o, o)
         return w, h+o, o
 
 class RendererPgf(RendererBase):
