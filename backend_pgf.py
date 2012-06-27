@@ -189,7 +189,19 @@ class RendererPgf(RendererBase):
     def draw_path(self, gc, path, transform, rgbFace=None):
         writeln(self.fh, r"\begin{pgfscope}")
         
-        # clip
+        # set cap style
+        capstyles = {"butt": r"\pgfsetbuttcap",
+                     "round": r"\pgfsetroundcap",
+                     "projecting": r"\pgfsetrectcap"}
+        writeln(self.fh, capstyles[gc.get_capstyle()])
+
+        # set join style
+        joinstyles = {"miter": r"\pgfsetmiterjoin",
+                      "round": r"\pgfsetroundjoin",
+                      "bevel": r"\pgfsetbeveljoin"}
+        writeln(self.fh, joinstyles[gc.get_joinstyle()])
+
+        # set clip
         bbox = gc.get_clip_rectangle()
         if bbox:
             p1, p2 = bbox.get_points()
