@@ -6,6 +6,8 @@ import shutil
 import tempfile
 import codecs
 import subprocess
+import warnings
+warnings.formatwarning = lambda *args: str(args[0])
 
 import matplotlib
 from matplotlib.backend_bases import RendererBase, GraphicsContextBase,\
@@ -21,13 +23,16 @@ from matplotlib import _png, rcParams
 # debug switch
 debug = bool(rcParams.get("pgf.debug", False))
 
-# default font
-# TODO: Computer Modern Unicode is not included in current latex distributions
-# the default font is missing alot of symbols though :/
-fontfamily = rcParams.get("pgf.font", "CMU Serif")
+# use xelatex default font if pgf.font is not set and emit a warning
+fontfamily = rcParams.get("pgf.font", "")
+if not fontfamily:
+    warnings.warn("""No font was specified in rc parameter 'pgf.font'.
+Using the XeLaTeX default font might result in incomplete glyph coverage.""", stacklevel=1)
 
 # latex preamble
 latex_preamble = rcParams.get("pgf.preamble", "")
+if type(latex_preamble) == list:
+    latex_preamble = "\n".join(latex_preamble)
 
 # is math text to be displaystyled? (large symbols)
 displaymath = bool(rcParams.get("pgf.displaymath", True))
@@ -66,31 +71,32 @@ class XelatexManager:
     changing the main font and by adding a custom latex preamble. These
     parameters are read from the rc settings "pgf.font" and "pgf.preamble".
     """
-    
-    # create header with some content, else latex will load some math fonts
-    # later when we don't expect the additional output on stdout
-    # TODO: is this sufficient?
-    latex_header = u"""\\documentclass{minimal}
+
+    def __init__(self):
+        # create latex header with some content, else latex will load some
+        # math fonts later when we don't expect the additional output on stdout
+        # TODO: is this sufficient?
+        setmainfont = r"\setmainfont{%s}" % fontfamily if fontfamily else ""
+        latex_header = u"""\\documentclass{minimal}
 %s
 \\usepackage{fontspec}
-\\setmainfont{%s}
+%s
 \\begin{document}
 text $math \mu$ %% force latex to load fonts now
 \\typeout{pgf_backend_query_start}
-""" % (latex_preamble, fontfamily)
+""" % (latex_preamble, setmainfont)
 
-    latex_end = """
+        latex_end = """
 \\makeatletter
 \\@@end
 """
-
-    def __init__(self):
+        
         # test the xelatex setup to ensure a clean startup of the subprocess
         xelatex = subprocess.Popen(["xelatex", "-halt-on-error"],
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE,
                                    universal_newlines=True)
-        stdout, stderr = xelatex.communicate(self.latex_header+self.latex_end)       
+        stdout, stderr = xelatex.communicate(latex_header + latex_end)       
         if xelatex.returncode != 0:
             raise XelatexError("Xelatex returned an error, probably missing font or error in preamble:\n%s" % stdout)
         
@@ -99,7 +105,7 @@ text $math \mu$ %% force latex to load fonts now
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE,
                                    universal_newlines=True)
-        xelatex.stdin.write(self.latex_header)
+        xelatex.stdin.write(latex_header)
         xelatex.stdin.flush()
         # read all lines until our 'pgf_backend_query_start' token appears
         while not xelatex.stdout.readline().startswith("*pgf_backend_query_start"):
@@ -414,18 +420,19 @@ class FigureCanvasPgf(FigureCanvasBase):
             os.chdir(tmpdir)
             self.print_pgf("figure.pgf")
 
+            setmainfont = r"\setmainfont{%s}" % fontfamily if fontfamily else ""
             latexcode = r"""
 \documentclass[12pt]{minimal}
 \usepackage[paperwidth=%fin, paperheight=%fin, margin=0in]{geometry}
 %s
 \usepackage{fontspec}
-\setmainfont{%s}
+%s
 \usepackage{pgf}
 
 \begin{document}
 \centering
 \input{figure.pgf}
-\end{document}""" % (w, h, latex_preamble, fontfamily)
+\end{document}""" % (w, h, latex_preamble, setmainfont)
             with codecs.open("figure.tex", "wt", "utf-8") as fh:
                 fh.write(latexcode)
             
