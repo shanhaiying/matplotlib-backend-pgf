@@ -5,9 +5,9 @@ import matplotlib
 use_pgf = True
 if use_pgf:
     matplotlib.use('module://backend_pgf')
-    matplotlib.rcParams.update({"pgf.xelatexmanager": True})
     matplotlib.rcParams.update({"pgf.displaymath": True})
     matplotlib.rcParams.update({"pgf.font": "CMU Serif"})
+    matplotlib.rcParams.update({"pgf.debug": False})
     #matplotlib.rcParams.update({"pgf.preamble": r"\usepackage{mathpazo}"})
 else:
     matplotlib.rcParams["text.latex.preamble"] = r"""

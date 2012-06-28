@@ -15,6 +15,4 @@ Although the pgf backend is very useful already and produces figures in publicat
 
 * Some text properties like selecting a different font family or making the text italic/bold are ignored since I did not need them yet.
 
-* The method of obtaining the metrics of text elements is pretty cool I think, but also very fragile right now. The XelatexManager runs an instance of XeLaTeX in a subprocess and queries the width/height/descent of the texts we want to print. Unfortunately, python does not provide a timeout option when reading from a subprocess. If something unexpected happens the read operation just stalls forever. I'm not sure whats the best option to solve this. Running a nonstop mode xelatex process for each text element might slow things down. Running the subprocess in a thread and communicate through a Queue might work.
- 
 * Because matplotlib behaves weird in some situations, there are a few workarounds also marked as TODO. Maybe one can get rid of those one day or find a better explanation why this workaround is necessary.

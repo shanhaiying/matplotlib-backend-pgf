@@ -19,26 +19,26 @@ from matplotlib import _png, rcParams
 # settings read from rc
 
 # debug switch
-debug = rcParams.get("pgf.debug", False)
+debug = bool(rcParams.get("pgf.debug", False))
 
 # default font
 # TODO: Computer Modern Unicode is not included in current latex distributions
 # the default font is missing alot of symbols though :/
 fontfamily = rcParams.get("pgf.font", "CMU Serif")
 
-# method for calculating font metrics
-use_xelatex_manager = rcParams.get("pgf.xelatexmanager", True)
-
 # latex preamble
-# TODO: the mathdefault macro matplotlib adds to some texts is unknown to me
 latex_preamble = rcParams.get("pgf.preamble", "")
-latex_preamble += "\\newcommand{\\mathdefault}[1]{#1}\n"
 
 # is math text to be displaystyled? (large symbols)
 displaymath = bool(rcParams.get("pgf.displaymath", True))
 
 ###############################################################################
 
+# TODO: matplotlib uses \mathdefault sometimes. this is an unknown latex macro
+mathdefault_search = re.compile(r"\\mathdefault")
+mathdefault_replace = lambda s: mathdefault_search.sub(r"\mathnormal", s)
+
+# method for reformatting inline math
 math_search = re.compile(r"\$([^\$]+)\$")
 math_replace = lambda match: r"\(\displaystyle %s\)" % match.group(1)
 def math_to_displaystyle(text):
@@ -53,6 +53,11 @@ def math_to_displaystyle(text):
 def writeln(fh, line):
     fh.write(line)
     fh.write("%\n")
+
+class XelatexError(Exception):
+    def __init__(self, message, latex_output = ""):
+        Exception.__init__(self, message)
+        self.latex_output = latex_output
 
 class XelatexManager:
     """
@@ -80,20 +85,20 @@ text $math \mu$ %% force latex to load fonts now
 """
 
     def __init__(self):
-        # test xelatex setup to ensure a clean startup of the subprocess
-        xelatex = subprocess.Popen(["xelatex"],
+        # test the xelatex setup to ensure a clean startup of the subprocess
+        xelatex = subprocess.Popen(["xelatex", "-halt-on-error"],
                                    stdin=subprocess.PIPE,
-                                   stdout=subprocess.PIPE)
-        xelatex.stdin.write(self.latex_header)
-        xelatex.stdin.write(self.latex_end)
-        xelatex.stdin.close()
-        if xelatex.wait() != 0:
-            raise RuntimeError("Xelatex returned an error, probably missing font or error in preamble")
+                                   stdout=subprocess.PIPE,
+                                   universal_newlines=True)
+        stdout, stderr = xelatex.communicate(self.latex_header+self.latex_end)       
+        if xelatex.returncode != 0:
+            raise XelatexError("Xelatex returned an error, probably missing font or error in preamble:\n%s" % stdout)
         
         # open xelatex process
-        xelatex = subprocess.Popen(["xelatex"],
+        xelatex = subprocess.Popen(["xelatex", "-halt-on-error"],
                                    stdin=subprocess.PIPE,
-                                   stdout=subprocess.PIPE)
+                                   stdout=subprocess.PIPE,
+                                   universal_newlines=True)
         xelatex.stdin.write(self.latex_header)
         xelatex.stdin.flush()
         # read all lines until our 'pgf_backend_query_start' token appears
@@ -103,6 +108,7 @@ text $math \mu$ %% force latex to load fonts now
             pass
         self.xelatex = xelatex
         self.xelatex_stdin = codecs.getwriter("utf-8")(xelatex.stdin)
+        self.xelatex_stdout = codecs.getreader("utf-8")(xelatex.stdout)
         
         # cache for strings already processed
         self.str_cache = {}
@@ -115,18 +121,29 @@ text $math \mu$ %% force latex to load fonts now
             os.remove("texput.aux")
         except:
             pass
+    
+    def _wait_for_prompt(self):
+        """
+        Read all bytes from XeLaTeX stdout until a new line starts with a *.
+        """
+        buf = [""]
+        while True:
+            buf.append(self.xelatex_stdout.read(1))
+            if buf[-1] == "*" and buf[-2] == "\n":
+                break
+            if buf[-1] == "":
+                raise XelatexError("XeLaTeX halted", u"".join(buf))
+        return "".join(buf)
 
     def get_width_height_descent(self, text, fontsize):
         """
         Get the width, total height and descent for a text typesetted by the
         current Xelatex environment.
-        """
+        """        
+        if debug: print "obtain metrics for: %s" % text
         
-        if debug: print "xelatex metrics for: %s" % text
-        # TODO: no error handling here. I haven't found a reliable way to
-        # set a timeout for the readline methods yet, so if something doesnt
-        # match the expected result the whole process blocks or we end up with
-        # returned lines we dont' understand correctly.
+        # replace unknown \mathdefault command from matplotlib
+        text = mathdefault_replace(text)
         
         # change fontsize and define textbox
         textbox = u"\\sbox0{\\fontsize{%f}{%f}\\selectfont{%s}}\n" % (fontsize, fontsize*1.2, text)
@@ -134,31 +151,36 @@ text $math \mu$ %% force latex to load fonts now
         if textbox in self.str_cache:
             return self.str_cache[textbox]
         
-        # send textbox to xelatex
+        # send textbox to xelatex and wait for prompt
         self.xelatex_stdin.write(unicode(textbox))
         self.xelatex_stdin.flush()
-        # wait for the next xelatex prompt
-        while self.xelatex.stdout.read(1) != "*":
-            pass
+        try:
+            self._wait_for_prompt()
+        except XelatexError as e:
+            msg = u"Error processing '%s'\nXelatex Output:\n%s" % (text, e.latex_output)
+            raise ValueError(msg)
 
         # typeout width, height and text offset of the last textbox
         query = "\\typeout{\\the\\wd0,\\the\\ht0,\\the\\dp0}\n"
         self.xelatex_stdin.write(query)
         self.xelatex_stdin.flush()
-        # read answer from latex and advance stdout to the next prompt (*)
-        answer = self.xelatex.stdout.readline().rstrip()
-        while self.xelatex.stdout.read(1) != "*":
-            pass
+        # read answer from latex and advance to the next prompt
+        try:
+            answer = self._wait_for_prompt()
+        except XelatexError as e:
+            msg = u"Error processing '%s'\nXelatex Output:\n%s" % (text, e.latex_output)
+            raise ValueError(msg)
         
         # parse metrics from the answer string
         try:
-            width, height, offset = answer.split(",")
+            width, height, offset = answer.split("\n")[0].split(",")
         except:
-            raise ValueError("Error processing string: %s" % text)
+            msg = "Error processing '%s'\nXelatex Output:\n%s" % (text, answer)
+            raise ValueError(msg)
         w, h, o = float(width[:-2]), float(height[:-2]), float(offset[:-2])
         
-        # the hight returned from xelatex goes from base to top.
-        # the hight matplotlib expects goes from bottom to top.
+        # the height returned from xelatex goes from base to top.
+        # the height matplotlib expects goes from bottom to top.
         self.str_cache[textbox] = (w, h+o, o)
         return w, h+o, o
 
@@ -166,7 +188,7 @@ class RendererPgf(RendererBase):
     
     xelatexManager = None
     
-    def __init__(self, figure, fh, draw_texts=True, use_xelatex_manager=True):
+    def __init__(self, figure, fh, draw_texts=True):
         """
         Creates a new Pgf renderer that translates any drawing instruction
         into commands to be interpreted in a latex pgfpicture environment.
@@ -181,9 +203,8 @@ class RendererPgf(RendererBase):
         self.draw_texts = draw_texts
         self.image_counter = 0
         
-        # if we use the xelatex manager, create a shared one
-        self.use_xelatex_manager = use_xelatex_manager
-        if use_xelatex_manager and self.xelatexManager is None:
+        # create a shared xelatexmanager
+        if self.xelatexManager is None:
             RendererPgf.xelatexManager = XelatexManager()
 
     def draw_path(self, gc, path, transform, rgbFace=None):
@@ -279,7 +300,10 @@ class RendererPgf(RendererBase):
 
     def draw_text(self, gc, x, y, s, prop, angle, ismath=False):
         if not self.draw_texts: return
-        
+
+        # replace unknown \mathdefault command from matplotlib
+        s = mathdefault_replace(s)
+
         # check if the math is supposed to be displaystyled
         if displaymath: s = math_to_displaystyle(s)
         
@@ -300,15 +324,8 @@ class RendererPgf(RendererBase):
         # check if the math is supposed to be displaystyled
         if displaymath: s = math_to_displaystyle(s)
         
-        # get text metrics in units of pt
-        if self.use_xelatex_manager:
-            texmanager = self.get_texmanager()
-            w, h, d = self.xelatexManager.get_width_height_descent(s, fontsize)
-        else:
-            texmanager = self.get_texmanager()
-            w, h, d = texmanager.get_text_width_height_descent(s, fontsize, renderer=self)
-
-        # convert metrics in display units
+        # get text metrics in units of pt, convert to display units
+        w, h, d = self.xelatexManager.get_width_height_descent(s, fontsize)
         f = self.dpi/72.0
         return w*f, h*f, d*f
 
@@ -374,8 +391,7 @@ class FigureCanvasPgf(FigureCanvasBase):
         writeln(fh, r"\pgfsetyvec{\pgfqpoint{0in}{%fin}}" % (1./dpi))
         
         # for pgf output, do not process text elements using the Renderer
-        renderer = RendererPgf(self.figure, fh, draw_texts=False,
-                               use_xelatex_manager=use_xelatex_manager)
+        renderer = RendererPgf(self.figure, fh, draw_texts=False)
         self.figure.draw(renderer)
         # manually extract text elements from the figure and draw them
         # TODO: this wouldn't be neccessary if draw_text received Text instances as documented
@@ -448,6 +464,7 @@ class FigureCanvasPgf(FigureCanvasBase):
             s = text.get_text()
             if not s or not text.get_visible(): continue
         
+            s = mathdefault_replace(s)
             if displaymath: s = math_to_displaystyle(s)
         
             fontsize = text.get_fontsize()
@@ -468,8 +485,7 @@ class FigureCanvasPgf(FigureCanvasBase):
             writeln(fh, ur"\pgftext[%s,x=%f,y=%f,rotate=%f]{%s}" % (align,x,y,angle,s))
     
     def get_renderer(self):
-        return RendererPgf(self.figure, None, draw_texts=False,
-                           use_xelatex_manager=use_xelatex_manager)
+        return RendererPgf(self.figure, None, draw_texts=False)
 
 class FigureManagerPgf(FigureManagerBase):
     def __init__(self, *args):
