@@ -18,7 +18,7 @@ When creating figures to be included in Latex documents the PDF backend is proba
 The following figure contains greek unicode letters, math text and normal text. It is produced using the PDF backend:
 
 \begin{figure}[h]
-\subfigure[Matplotlib PDF backend. Serif font not consistent with the Latex default font. Math-text does not fit to normal text. Greek letters are not aligned correctly.]{\includegraphics{figure-pdf.pdf}}
+\subfigure[Matplotlib PDF backend. Serif font not consistent with the Latex default font. Math-text not consistent with normal text. Some letters are not aligned correctly.]{\includegraphics{figure-pdf.pdf}}
 \hspace{1mm}
 \subfigure[Matplotlib with Latex rendering. Consistent look in Latex documents, better looking math-text, but no real unicode support. The conversion process to PDF increases the filesize a lot. Greek letters are missing and the micro sign is replaced by an italic mu-symbol from the math font. Baseline offset of the second label is incorrect.]{\includegraphics{figure-pdf-usetex.pdf}}
 \caption{PDF figures created with matplotlib v1.1.1.}
@@ -29,12 +29,12 @@ The following figure contains greek unicode letters, math text and normal text. 
 \subsection*{Pgf Backend with Xelatex}
 
 For real unicode support the use of Xelatex or Lualatex is mandatory. In order to use these new Latex implementations in Matplotlib, a new backend is required as the \textit{pstricks} methods for drawing the figures are not available anymore. The \textit{pgfpicture} package offers an alternative that works for Pdflatex, Xelatex and Lualatex alike. These commands can be included in Latex documents directly (\textbackslash input) or be pre-compiled to PDF for inclusion (\textbackslash
- includegraphics). For a most consistent appearance, the font \textit{Computer Modern Unicode} available at \url{http://sourceforge.net/projects/cm-unicode/} must be installed, since the default Latex font misses most of the unicode letters. Any other installed system font will work as well though.
+ includegraphics). For a most consistent appearance, the font \textit{Computer Modern Unicode} available at \url{http://sourceforge.net/projects/cm-unicode/} must be installed, since the default Latex font misses most of the unicode letters. Any other installed system font will work as well, although one has to find a matching package for the math fonts then.
 
 \begin{figure}[h]
 \subfigure[Computer Modern Unicode font]{\input{figure.pgf}}
 \hspace{1mm}
-\subfigure[Main font switched to {\setmainfont{Linux Biolinum O}Biolinum}]{\setmainfont{Linux Biolinum O}\input{figure.pgf}}
+\subfigure[{\setmainfont{Linux Biolinum O}Main font switched to Biolinum}]{\setmainfont{Linux Biolinum O}\input{figure.pgf}}
 \caption{Pgf figure commands included in a Xelatex compiled document. The fonts were changed within the document without recreating the figure in matplotlib.}
 \end{figure}
 

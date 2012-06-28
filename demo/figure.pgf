@@ -23,10 +23,10 @@
 \begin{pgfscope}%
 \pgfsetrectcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{39.598208}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{39.598208}}%
 \pgfpathlineto{\pgfqpointxy{250.237500}{39.598208}}%
 \pgfpathlineto{\pgfqpointxy{250.237500}{194.744451}}%
-\pgfpathlineto{\pgfqpointxy{25.080556}{194.744451}}%
+\pgfpathlineto{\pgfqpointxy{45.774986}{194.744451}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{1.000000,1.000000,1.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -39,28 +39,28 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{39.598208}}%
-\pgfpathlineto{\pgfqpointxy{36.930921}{40.027976}}%
-\pgfpathlineto{\pgfqpointxy{48.781287}{41.317280}}%
-\pgfpathlineto{\pgfqpointxy{60.631652}{43.466120}}%
-\pgfpathlineto{\pgfqpointxy{72.482018}{46.474496}}%
-\pgfpathlineto{\pgfqpointxy{84.332383}{50.342408}}%
-\pgfpathlineto{\pgfqpointxy{96.182749}{55.069856}}%
-\pgfpathlineto{\pgfqpointxy{108.033114}{60.656840}}%
-\pgfpathlineto{\pgfqpointxy{119.883480}{67.103359}}%
-\pgfpathlineto{\pgfqpointxy{131.733845}{74.409415}}%
-\pgfpathlineto{\pgfqpointxy{143.584211}{82.575007}}%
-\pgfpathlineto{\pgfqpointxy{155.434576}{91.600135}}%
-\pgfpathlineto{\pgfqpointxy{167.284942}{101.484798}}%
-\pgfpathlineto{\pgfqpointxy{179.135307}{112.228998}}%
-\pgfpathlineto{\pgfqpointxy{190.985673}{123.832734}}%
-\pgfpathlineto{\pgfqpointxy{202.836038}{136.296005}}%
-\pgfpathlineto{\pgfqpointxy{214.686404}{149.618813}}%
-\pgfpathlineto{\pgfqpointxy{226.536769}{163.801156}}%
-\pgfpathlineto{\pgfqpointxy{238.387135}{178.843036}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{39.598208}}%
+\pgfpathlineto{\pgfqpointxy{56.536171}{40.027976}}%
+\pgfpathlineto{\pgfqpointxy{67.297356}{41.317280}}%
+\pgfpathlineto{\pgfqpointxy{78.058541}{43.466120}}%
+\pgfpathlineto{\pgfqpointxy{88.819726}{46.474496}}%
+\pgfpathlineto{\pgfqpointxy{99.580911}{50.342408}}%
+\pgfpathlineto{\pgfqpointxy{110.342096}{55.069856}}%
+\pgfpathlineto{\pgfqpointxy{121.103281}{60.656840}}%
+\pgfpathlineto{\pgfqpointxy{131.864466}{67.103359}}%
+\pgfpathlineto{\pgfqpointxy{142.625651}{74.409415}}%
+\pgfpathlineto{\pgfqpointxy{153.386836}{82.575007}}%
+\pgfpathlineto{\pgfqpointxy{164.148020}{91.600135}}%
+\pgfpathlineto{\pgfqpointxy{174.909205}{101.484798}}%
+\pgfpathlineto{\pgfqpointxy{185.670390}{112.228998}}%
+\pgfpathlineto{\pgfqpointxy{196.431575}{123.832734}}%
+\pgfpathlineto{\pgfqpointxy{207.192760}{136.296005}}%
+\pgfpathlineto{\pgfqpointxy{217.953945}{149.618813}}%
+\pgfpathlineto{\pgfqpointxy{228.715130}{163.801156}}%
+\pgfpathlineto{\pgfqpointxy{239.476315}{178.843036}}%
 \pgfpathlineto{\pgfqpointxy{250.237500}{194.744451}}%
 \pgfsetlinewidth{2.000000pt}%
 \definecolor{currentstroke}{rgb}{1.000000,0.000000,0.000000}%
@@ -71,28 +71,28 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{194.744451}}%
-\pgfpathlineto{\pgfqpointxy{36.930921}{194.314683}}%
-\pgfpathlineto{\pgfqpointxy{48.781287}{193.025379}}%
-\pgfpathlineto{\pgfqpointxy{60.631652}{190.876540}}%
-\pgfpathlineto{\pgfqpointxy{72.482018}{187.868164}}%
-\pgfpathlineto{\pgfqpointxy{84.332383}{184.000252}}%
-\pgfpathlineto{\pgfqpointxy{96.182749}{179.272804}}%
-\pgfpathlineto{\pgfqpointxy{108.033114}{173.685820}}%
-\pgfpathlineto{\pgfqpointxy{119.883480}{167.239300}}%
-\pgfpathlineto{\pgfqpointxy{131.733845}{159.933244}}%
-\pgfpathlineto{\pgfqpointxy{143.584211}{151.767653}}%
-\pgfpathlineto{\pgfqpointxy{155.434576}{142.742525}}%
-\pgfpathlineto{\pgfqpointxy{167.284942}{132.857861}}%
-\pgfpathlineto{\pgfqpointxy{179.135307}{122.113662}}%
-\pgfpathlineto{\pgfqpointxy{190.985673}{110.509926}}%
-\pgfpathlineto{\pgfqpointxy{202.836038}{98.046654}}%
-\pgfpathlineto{\pgfqpointxy{214.686404}{84.723847}}%
-\pgfpathlineto{\pgfqpointxy{226.536769}{70.541503}}%
-\pgfpathlineto{\pgfqpointxy{238.387135}{55.499624}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{194.744451}}%
+\pgfpathlineto{\pgfqpointxy{56.536171}{194.314683}}%
+\pgfpathlineto{\pgfqpointxy{67.297356}{193.025379}}%
+\pgfpathlineto{\pgfqpointxy{78.058541}{190.876540}}%
+\pgfpathlineto{\pgfqpointxy{88.819726}{187.868164}}%
+\pgfpathlineto{\pgfqpointxy{99.580911}{184.000252}}%
+\pgfpathlineto{\pgfqpointxy{110.342096}{179.272804}}%
+\pgfpathlineto{\pgfqpointxy{121.103281}{173.685820}}%
+\pgfpathlineto{\pgfqpointxy{131.864466}{167.239300}}%
+\pgfpathlineto{\pgfqpointxy{142.625651}{159.933244}}%
+\pgfpathlineto{\pgfqpointxy{153.386836}{151.767653}}%
+\pgfpathlineto{\pgfqpointxy{164.148020}{142.742525}}%
+\pgfpathlineto{\pgfqpointxy{174.909205}{132.857861}}%
+\pgfpathlineto{\pgfqpointxy{185.670390}{122.113662}}%
+\pgfpathlineto{\pgfqpointxy{196.431575}{110.509926}}%
+\pgfpathlineto{\pgfqpointxy{207.192760}{98.046654}}%
+\pgfpathlineto{\pgfqpointxy{217.953945}{84.723847}}%
+\pgfpathlineto{\pgfqpointxy{228.715130}{70.541503}}%
+\pgfpathlineto{\pgfqpointxy{239.476315}{55.499624}}%
 \pgfpathlineto{\pgfqpointxy{250.237500}{39.598208}}%
 \pgfsetlinewidth{1.000000pt}%
 \definecolor{currentstroke}{rgb}{0.000000,0.000000,1.000000}%
@@ -103,12 +103,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{28.080556}{39.598208}}%
-\pgfpathlineto{\pgfqpointxy{22.080556}{42.598208}}%
-\pgfpathlineto{\pgfqpointxy{22.080556}{36.598208}}%
+\pgfpathmoveto{\pgfqpointxy{48.774986}{39.598208}}%
+\pgfpathlineto{\pgfqpointxy{42.774986}{42.598208}}%
+\pgfpathlineto{\pgfqpointxy{42.774986}{36.598208}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -121,12 +121,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{39.930921}{41.231327}}%
-\pgfpathlineto{\pgfqpointxy{33.930921}{44.231327}}%
-\pgfpathlineto{\pgfqpointxy{33.930921}{38.231327}}%
+\pgfpathmoveto{\pgfqpointxy{59.536171}{41.231327}}%
+\pgfpathlineto{\pgfqpointxy{53.536171}{44.231327}}%
+\pgfpathlineto{\pgfqpointxy{53.536171}{38.231327}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -139,12 +139,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{51.781287}{42.864445}}%
-\pgfpathlineto{\pgfqpointxy{45.781287}{45.864445}}%
-\pgfpathlineto{\pgfqpointxy{45.781287}{39.864445}}%
+\pgfpathmoveto{\pgfqpointxy{70.297356}{42.864445}}%
+\pgfpathlineto{\pgfqpointxy{64.297356}{45.864445}}%
+\pgfpathlineto{\pgfqpointxy{64.297356}{39.864445}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -157,12 +157,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{63.631652}{44.497563}}%
-\pgfpathlineto{\pgfqpointxy{57.631652}{47.497563}}%
-\pgfpathlineto{\pgfqpointxy{57.631652}{41.497563}}%
+\pgfpathmoveto{\pgfqpointxy{81.058541}{44.497563}}%
+\pgfpathlineto{\pgfqpointxy{75.058541}{47.497563}}%
+\pgfpathlineto{\pgfqpointxy{75.058541}{41.497563}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -175,12 +175,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{75.482018}{46.130682}}%
-\pgfpathlineto{\pgfqpointxy{69.482018}{49.130682}}%
-\pgfpathlineto{\pgfqpointxy{69.482018}{43.130682}}%
+\pgfpathmoveto{\pgfqpointxy{91.819726}{46.130682}}%
+\pgfpathlineto{\pgfqpointxy{85.819726}{49.130682}}%
+\pgfpathlineto{\pgfqpointxy{85.819726}{43.130682}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -193,12 +193,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{87.332383}{47.763800}}%
-\pgfpathlineto{\pgfqpointxy{81.332383}{50.763800}}%
-\pgfpathlineto{\pgfqpointxy{81.332383}{44.763800}}%
+\pgfpathmoveto{\pgfqpointxy{102.580911}{47.763800}}%
+\pgfpathlineto{\pgfqpointxy{96.580911}{50.763800}}%
+\pgfpathlineto{\pgfqpointxy{96.580911}{44.763800}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -211,12 +211,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{99.182749}{49.396918}}%
-\pgfpathlineto{\pgfqpointxy{93.182749}{52.396918}}%
-\pgfpathlineto{\pgfqpointxy{93.182749}{46.396918}}%
+\pgfpathmoveto{\pgfqpointxy{113.342096}{49.396918}}%
+\pgfpathlineto{\pgfqpointxy{107.342096}{52.396918}}%
+\pgfpathlineto{\pgfqpointxy{107.342096}{46.396918}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -229,12 +229,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{111.033114}{51.030037}}%
-\pgfpathlineto{\pgfqpointxy{105.033114}{54.030037}}%
-\pgfpathlineto{\pgfqpointxy{105.033114}{48.030037}}%
+\pgfpathmoveto{\pgfqpointxy{124.103281}{51.030037}}%
+\pgfpathlineto{\pgfqpointxy{118.103281}{54.030037}}%
+\pgfpathlineto{\pgfqpointxy{118.103281}{48.030037}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -247,12 +247,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{122.883480}{52.663155}}%
-\pgfpathlineto{\pgfqpointxy{116.883480}{55.663155}}%
-\pgfpathlineto{\pgfqpointxy{116.883480}{49.663155}}%
+\pgfpathmoveto{\pgfqpointxy{134.864466}{52.663155}}%
+\pgfpathlineto{\pgfqpointxy{128.864466}{55.663155}}%
+\pgfpathlineto{\pgfqpointxy{128.864466}{49.663155}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -265,12 +265,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{134.733845}{54.296273}}%
-\pgfpathlineto{\pgfqpointxy{128.733845}{57.296273}}%
-\pgfpathlineto{\pgfqpointxy{128.733845}{51.296273}}%
+\pgfpathmoveto{\pgfqpointxy{145.625651}{54.296273}}%
+\pgfpathlineto{\pgfqpointxy{139.625651}{57.296273}}%
+\pgfpathlineto{\pgfqpointxy{139.625651}{51.296273}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -283,12 +283,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{146.584211}{55.929392}}%
-\pgfpathlineto{\pgfqpointxy{140.584211}{58.929392}}%
-\pgfpathlineto{\pgfqpointxy{140.584211}{52.929392}}%
+\pgfpathmoveto{\pgfqpointxy{156.386836}{55.929392}}%
+\pgfpathlineto{\pgfqpointxy{150.386836}{58.929392}}%
+\pgfpathlineto{\pgfqpointxy{150.386836}{52.929392}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -301,12 +301,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{158.434576}{57.562510}}%
-\pgfpathlineto{\pgfqpointxy{152.434576}{60.562510}}%
-\pgfpathlineto{\pgfqpointxy{152.434576}{54.562510}}%
+\pgfpathmoveto{\pgfqpointxy{167.148020}{57.562510}}%
+\pgfpathlineto{\pgfqpointxy{161.148020}{60.562510}}%
+\pgfpathlineto{\pgfqpointxy{161.148020}{54.562510}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -319,12 +319,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{170.284942}{59.195629}}%
-\pgfpathlineto{\pgfqpointxy{164.284942}{62.195629}}%
-\pgfpathlineto{\pgfqpointxy{164.284942}{56.195629}}%
+\pgfpathmoveto{\pgfqpointxy{177.909205}{59.195629}}%
+\pgfpathlineto{\pgfqpointxy{171.909205}{62.195629}}%
+\pgfpathlineto{\pgfqpointxy{171.909205}{56.195629}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -337,12 +337,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{182.135307}{60.828747}}%
-\pgfpathlineto{\pgfqpointxy{176.135307}{63.828747}}%
-\pgfpathlineto{\pgfqpointxy{176.135307}{57.828747}}%
+\pgfpathmoveto{\pgfqpointxy{188.670390}{60.828747}}%
+\pgfpathlineto{\pgfqpointxy{182.670390}{63.828747}}%
+\pgfpathlineto{\pgfqpointxy{182.670390}{57.828747}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -355,12 +355,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{193.985673}{62.461865}}%
-\pgfpathlineto{\pgfqpointxy{187.985673}{65.461865}}%
-\pgfpathlineto{\pgfqpointxy{187.985673}{59.461865}}%
+\pgfpathmoveto{\pgfqpointxy{199.431575}{62.461865}}%
+\pgfpathlineto{\pgfqpointxy{193.431575}{65.461865}}%
+\pgfpathlineto{\pgfqpointxy{193.431575}{59.461865}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -373,12 +373,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{205.836038}{64.094984}}%
-\pgfpathlineto{\pgfqpointxy{199.836038}{67.094984}}%
-\pgfpathlineto{\pgfqpointxy{199.836038}{61.094984}}%
+\pgfpathmoveto{\pgfqpointxy{210.192760}{64.094984}}%
+\pgfpathlineto{\pgfqpointxy{204.192760}{67.094984}}%
+\pgfpathlineto{\pgfqpointxy{204.192760}{61.094984}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -391,12 +391,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{217.686404}{65.728102}}%
-\pgfpathlineto{\pgfqpointxy{211.686404}{68.728102}}%
-\pgfpathlineto{\pgfqpointxy{211.686404}{62.728102}}%
+\pgfpathmoveto{\pgfqpointxy{220.953945}{65.728102}}%
+\pgfpathlineto{\pgfqpointxy{214.953945}{68.728102}}%
+\pgfpathlineto{\pgfqpointxy{214.953945}{62.728102}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -409,12 +409,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{229.536769}{67.361220}}%
-\pgfpathlineto{\pgfqpointxy{223.536769}{70.361220}}%
-\pgfpathlineto{\pgfqpointxy{223.536769}{64.361220}}%
+\pgfpathmoveto{\pgfqpointxy{231.715130}{67.361220}}%
+\pgfpathlineto{\pgfqpointxy{225.715130}{70.361220}}%
+\pgfpathlineto{\pgfqpointxy{225.715130}{64.361220}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -427,12 +427,12 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
-\pgfpathmoveto{\pgfqpointxy{241.387135}{68.994339}}%
-\pgfpathlineto{\pgfqpointxy{235.387135}{71.994339}}%
-\pgfpathlineto{\pgfqpointxy{235.387135}{65.994339}}%
+\pgfpathmoveto{\pgfqpointxy{242.476315}{68.994339}}%
+\pgfpathlineto{\pgfqpointxy{236.476315}{71.994339}}%
+\pgfpathlineto{\pgfqpointxy{236.476315}{65.994339}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{0.000000,0.500000,0.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -445,7 +445,7 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetmiterjoin%
-\pgfpathrectangle{\pgfqpointxy{25.080556}{39.598208}}{\pgfqpointxy{225.156944}{155.146243}} %
+\pgfpathrectangle{\pgfqpointxy{45.774986}{39.598208}}{\pgfqpointxy{204.462514}{155.146243}} %
 \pgfsetstrokecolor{red}%
 \pgfusepath{clip}%
 \pgfpathmoveto{\pgfqpointxy{253.237500}{70.627457}}%
@@ -463,8 +463,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{39.598208}}%
-\pgfpathlineto{\pgfqpointxy{25.080556}{43.598208}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{39.598208}}%
+\pgfpathlineto{\pgfqpointxy{45.774986}{43.598208}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -476,8 +476,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{194.744451}}%
-\pgfpathlineto{\pgfqpointxy{25.080556}{190.744451}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{194.744451}}%
+\pgfpathlineto{\pgfqpointxy{45.774986}{190.744451}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -489,8 +489,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{70.111944}{39.598208}}%
-\pgfpathlineto{\pgfqpointxy{70.111944}{43.598208}}%
+\pgfpathmoveto{\pgfqpointxy{86.667489}{39.598208}}%
+\pgfpathlineto{\pgfqpointxy{86.667489}{43.598208}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -502,8 +502,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{70.111944}{194.744451}}%
-\pgfpathlineto{\pgfqpointxy{70.111944}{190.744451}}%
+\pgfpathmoveto{\pgfqpointxy{86.667489}{194.744451}}%
+\pgfpathlineto{\pgfqpointxy{86.667489}{190.744451}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -515,8 +515,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{115.143333}{39.598208}}%
-\pgfpathlineto{\pgfqpointxy{115.143333}{43.598208}}%
+\pgfpathmoveto{\pgfqpointxy{127.559992}{39.598208}}%
+\pgfpathlineto{\pgfqpointxy{127.559992}{43.598208}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -528,8 +528,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{115.143333}{194.744451}}%
-\pgfpathlineto{\pgfqpointxy{115.143333}{190.744451}}%
+\pgfpathmoveto{\pgfqpointxy{127.559992}{194.744451}}%
+\pgfpathlineto{\pgfqpointxy{127.559992}{190.744451}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -541,8 +541,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{160.174722}{39.598208}}%
-\pgfpathlineto{\pgfqpointxy{160.174722}{43.598208}}%
+\pgfpathmoveto{\pgfqpointxy{168.452494}{39.598208}}%
+\pgfpathlineto{\pgfqpointxy{168.452494}{43.598208}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -554,8 +554,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{160.174722}{194.744451}}%
-\pgfpathlineto{\pgfqpointxy{160.174722}{190.744451}}%
+\pgfpathmoveto{\pgfqpointxy{168.452494}{194.744451}}%
+\pgfpathlineto{\pgfqpointxy{168.452494}{190.744451}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -567,8 +567,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{205.206111}{39.598208}}%
-\pgfpathlineto{\pgfqpointxy{205.206111}{43.598208}}%
+\pgfpathmoveto{\pgfqpointxy{209.344997}{39.598208}}%
+\pgfpathlineto{\pgfqpointxy{209.344997}{43.598208}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -580,8 +580,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{205.206111}{194.744451}}%
-\pgfpathlineto{\pgfqpointxy{205.206111}{190.744451}}%
+\pgfpathmoveto{\pgfqpointxy{209.344997}{194.744451}}%
+\pgfpathlineto{\pgfqpointxy{209.344997}{190.744451}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -619,8 +619,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{39.598208}}%
-\pgfpathlineto{\pgfqpointxy{29.080556}{39.598208}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{39.598208}}%
+\pgfpathlineto{\pgfqpointxy{49.774986}{39.598208}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -645,8 +645,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{70.627457}}%
-\pgfpathlineto{\pgfqpointxy{29.080556}{70.627457}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{70.627457}}%
+\pgfpathlineto{\pgfqpointxy{49.774986}{70.627457}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -671,8 +671,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{101.656706}}%
-\pgfpathlineto{\pgfqpointxy{29.080556}{101.656706}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{101.656706}}%
+\pgfpathlineto{\pgfqpointxy{49.774986}{101.656706}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -697,8 +697,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{132.685954}}%
-\pgfpathlineto{\pgfqpointxy{29.080556}{132.685954}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{132.685954}}%
+\pgfpathlineto{\pgfqpointxy{49.774986}{132.685954}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -723,8 +723,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{163.715203}}%
-\pgfpathlineto{\pgfqpointxy{29.080556}{163.715203}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{163.715203}}%
+\pgfpathlineto{\pgfqpointxy{49.774986}{163.715203}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -749,8 +749,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{194.744451}}%
-\pgfpathlineto{\pgfqpointxy{29.080556}{194.744451}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{194.744451}}%
+\pgfpathlineto{\pgfqpointxy{49.774986}{194.744451}}%
 \definecolor{currentfill}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetfillcolor{currentfill}%
 \pgfsetlinewidth{0.500000pt}%
@@ -775,7 +775,7 @@
 \begin{pgfscope}%
 \pgfsetrectcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{194.744451}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{194.744451}}%
 \pgfpathlineto{\pgfqpointxy{250.237500}{194.744451}}%
 \pgfsetlinewidth{1.000000pt}%
 \definecolor{currentstroke}{rgb}{0.000000,0.000000,0.000000}%
@@ -797,7 +797,7 @@
 \begin{pgfscope}%
 \pgfsetrectcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{39.598208}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{39.598208}}%
 \pgfpathlineto{\pgfqpointxy{250.237500}{39.598208}}%
 \pgfsetlinewidth{1.000000pt}%
 \definecolor{currentstroke}{rgb}{0.000000,0.000000,0.000000}%
@@ -808,8 +808,8 @@
 \begin{pgfscope}%
 \pgfsetrectcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{25.080556}{39.598208}}%
-\pgfpathlineto{\pgfqpointxy{25.080556}{194.744451}}%
+\pgfpathmoveto{\pgfqpointxy{45.774986}{39.598208}}%
+\pgfpathlineto{\pgfqpointxy{45.774986}{194.744451}}%
 \pgfsetlinewidth{1.000000pt}%
 \definecolor{currentstroke}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{currentstroke}%
@@ -819,11 +819,11 @@
 \begin{pgfscope}%
 \pgfsetrectcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{85.163681}{128.199396}}%
+\pgfpathmoveto{\pgfqpointxy{85.115278}{128.199396}}%
 \pgfpathlineto{\pgfqpointxy{244.737500}{128.199396}}%
 \pgfpathlineto{\pgfqpointxy{244.737500}{189.244451}}%
-\pgfpathlineto{\pgfqpointxy{85.163681}{189.244451}}%
-\pgfpathlineto{\pgfqpointxy{85.163681}{128.199396}}%
+\pgfpathlineto{\pgfqpointxy{85.115278}{189.244451}}%
+\pgfpathlineto{\pgfqpointxy{85.115278}{128.199396}}%
 \pgfpathclose%
 \definecolor{currentfill}{rgb}{1.000000,1.000000,1.000000}%
 \pgfsetfillcolor{currentfill}%
@@ -836,8 +836,8 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{92.863681}{177.725007}}%
-\pgfpathlineto{\pgfqpointxy{108.263681}{177.725007}}%
+\pgfpathmoveto{\pgfqpointxy{92.815278}{177.725007}}%
+\pgfpathlineto{\pgfqpointxy{108.215278}{177.725007}}%
 \pgfsetlinewidth{2.000000pt}%
 \definecolor{currentstroke}{rgb}{1.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{currentstroke}%
@@ -847,28 +847,29 @@
 \begin{pgfscope}%
 \pgfsetbuttcap%
 \pgfsetroundjoin%
-\pgfpathmoveto{\pgfqpointxy{92.863681}{148.774049}}%
-\pgfpathlineto{\pgfqpointxy{108.263681}{148.774049}}%
+\pgfpathmoveto{\pgfqpointxy{92.815278}{148.774049}}%
+\pgfpathlineto{\pgfqpointxy{108.215278}{148.774049}}%
 \pgfsetlinewidth{1.000000pt}%
 \definecolor{currentstroke}{rgb}{0.000000,0.000000,1.000000}%
 \pgfsetstrokecolor{currentstroke}%
 \pgfsetdash{{3.000000pt}{3.000000pt}{1.000000pt}{3.000000pt}}{0cm}%
 \pgfusepath{stroke,}%
 \end{pgfscope}%
-\pgftext[base,left,x=86.661850,y=125.190005,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont Unicode, έψιλον}}%
-\pgftext[top,,x=82.903200,y=24.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.4}}%
-\pgftext[,right,x=14.058000,y=140.216005,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 1.0}}%
-\pgftext[top,,x=147.748400,y=24.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.8}}%
-\pgftext[,right,x=14.058000,y=117.874946,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.8}}%
-\pgftext[top,,x=18.058000,y=24.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.0}}%
-\pgftext[top,,x=99.114500,y=11.821720,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle x\)-axis in units of \(\displaystyle 10^3\,\)µm}}%
-\pgftext[,right,x=14.058000,y=95.533887,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.6}}%
+\pgftext[top,,x=91.843194,y=24.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.4}}%
+\pgftext[top,,x=62.400592,y=24.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.2}}%
+\pgftext[top,,x=32.957990,y=24.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.0}}%
+\pgftext[,right,x=28.957990,y=140.216005,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 1.0}}%
+\pgftext[top,,x=106.564495,y=11.821720,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont \(\displaystyle x\)-axis in units of \(\displaystyle 10^3\,\)µm}}%
+\pgftext[,right,x=28.957990,y=117.874946,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.8}}%
+\pgftext[,bottom,x=9.899990,y=84.363358,rotate=90.000000]{{\fontsize{11.000000}{13.200000}\selectfont angle \(\displaystyle \alpha\) in °}}%
+\pgftext[base,left,x=86.627000,y=125.190005,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont Unicode, ияäüέψλ}}%
 \pgftext[top,,x=180.171000,y=24.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 1.0}}%
-\pgftext[,right,x=14.058000,y=73.192828,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.4}}%
-\pgftext[,right,x=14.058000,y=50.851769,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.2}}%
-\pgftext[,right,x=14.058000,y=28.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.0}}%
-\pgftext[top,,x=50.480600,y=24.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.2}}%
-\pgftext[top,,x=115.325800,y=24.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.6}}%
-\pgftext[base,left,x=86.661850,y=104.345315,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont Math, \(\displaystyle \int_\Omega \mu \cdot x^2\,\mathrm{d}x\)}}%
+\pgftext[,right,x=28.957990,y=28.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.0}}%
+\pgftext[,right,x=28.957990,y=50.851769,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.2}}%
+\pgftext[,right,x=28.957990,y=73.192828,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.4}}%
+\pgftext[base,left,x=86.627000,y=104.345315,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont Math, \(\displaystyle \int_\Omega \mu \cdot x^2\,\mathrm{d}x\)}}%
+\pgftext[,right,x=28.957990,y=95.533887,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.6}}%
+\pgftext[top,,x=150.728398,y=24.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.8}}%
+\pgftext[top,,x=121.285796,y=24.510710,rotate=0.000000]{{\fontsize{11.000000}{13.200000}\selectfont 0.6}}%
 \end{pgfpicture}%
 \endgroup%
