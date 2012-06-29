@@ -2,7 +2,7 @@
 
 import matplotlib
 
-use_pgf = False
+use_pgf = True
 if use_pgf:
     matplotlib.use('module://backend_pgf')
     matplotlib.rcParams.update({"pgf.font": "CMU Serif"})
@@ -44,8 +44,8 @@ p.legend()
 
 if use_pgf:
     print "saving pgf figures in demo/"
-    p.savefig("demo/figure-pgf.pdf")
     p.savefig("demo/figure.pgf")
+    p.savefig("demo/figure-pgf.pdf")    
 elif matplotlib.rcParams["text.usetex"]:
     print "saving pdf-usetex figure in demo/"
     p.savefig("demo/figure-pdf-usetex.pdf")

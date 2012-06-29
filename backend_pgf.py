@@ -213,30 +213,82 @@ class RendererPgf(RendererBase):
         if self.xelatexManager is None:
             RendererPgf.xelatexManager = XelatexManager()
 
+    def draw_markers(self, gc, marker_path, marker_trans, path, trans, rgbFace=None):
+        writeln(self.fh, r"\begin{pgfscope}")
+
+        # set style and clip
+        self._pgf_clip(gc)
+        self._pgf_path_styles(gc, rgbFace)
+     
+        # build marker definition
+        bl, tr = marker_path.get_extents(marker_trans).get_points()
+        writeln(self.fh, r"\pgfsys@defobject{currentmarker}{\pgfqpointxy{%f}{%f}}{\pgfqpointxy{%f}{%f}}{" % (bl[0],bl[1],tr[0],tr[1]))
+        self._pgf_path(gc, marker_path, marker_trans, filled=bool(rgbFace))
+        writeln(self.fh, r"}")
+        
+        # convert from display units to pt, transformshift needs real units
+        f = 72.0/self.dpi
+        # draw marker for each vertex
+        for point, code in path.iter_segments(trans, simplify=False):
+            x, y = tuple(point)
+            writeln(self.fh, r"\begin{pgfscope}")
+            writeln(self.fh, r"\pgfsys@transformshift{%fpt}{%fpt}" % (f*x,f*y))
+            writeln(self.fh, r"\pgfsys@useobject{currentmarker}{}")
+            writeln(self.fh, r"\end{pgfscope}")
+
+        writeln(self.fh, r"\end{pgfscope}")
+    
     def draw_path(self, gc, path, transform, rgbFace=None):
         writeln(self.fh, r"\begin{pgfscope}")
-        
-        # set cap style
-        capstyles = {"butt": r"\pgfsetbuttcap",
-                     "round": r"\pgfsetroundcap",
-                     "projecting": r"\pgfsetrectcap"}
-        writeln(self.fh, capstyles[gc.get_capstyle()])
-
-        # set join style
-        joinstyles = {"miter": r"\pgfsetmiterjoin",
-                      "round": r"\pgfsetroundjoin",
-                      "bevel": r"\pgfsetbeveljoin"}
-        writeln(self.fh, joinstyles[gc.get_joinstyle()])
-
-        # set clip
+        self._pgf_clip(gc)
+        self._pgf_path_styles(gc, rgbFace)
+        self._pgf_path(gc, path, transform, filled=bool(rgbFace))
+        writeln(self.fh, r"\end{pgfscope}")
+    
+    def _pgf_clip(self, gc):
         bbox = gc.get_clip_rectangle()
         if bbox:
             p1, p2 = bbox.get_points()
             w, h = p2-p1
             writeln(self.fh, r"\pgfpathrectangle{\pgfqpointxy{%f}{%f}}{\pgfqpointxy{%f}{%f}} " % (p1[0],p1[1],w,h))
-            writeln(self.fh, r"\pgfsetstrokecolor{red}")     
             writeln(self.fh, r"\pgfusepath{clip}")
+    
+    def _pgf_path_styles(self, gc, rgbFace):
+        # cap style
+        capstyles = {"butt": r"\pgfsetbuttcap",
+                     "round": r"\pgfsetroundcap",
+                     "projecting": r"\pgfsetrectcap"}
+        writeln(self.fh, capstyles[gc.get_capstyle()])
+
+        # join style
+        joinstyles = {"miter": r"\pgfsetmiterjoin",
+                      "round": r"\pgfsetroundjoin",
+                      "bevel": r"\pgfsetbeveljoin"}
+        writeln(self.fh, joinstyles[gc.get_joinstyle()])
         
+        # filling
+        if rgbFace is not None:
+            writeln(self.fh, r"\definecolor{currentfill}{rgb}{%f,%f,%f}" % tuple(rgbFace[:3]))
+            writeln(self.fh, r"\pgfsetfillcolor{currentfill}")
+            
+        # linewidth and color
+        lw = gc.get_linewidth()
+        writeln(self.fh, r"\pgfsetlinewidth{%fpt}" % lw)
+        writeln(self.fh, r"\definecolor{currentstroke}{rgb}{%f,%f,%f}" % gc.get_rgb()[:3])
+        writeln(self.fh, r"\pgfsetstrokecolor{currentstroke}")
+        
+        # line style
+        ls = gc.get_linestyle(None)
+        if ls == "solid":
+            writeln(self.fh, r"\pgfsetdash{}{0pt}")
+        elif ls == "dashed":
+            writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}}{0cm}" % (2.5*lw, 2.5*lw))
+        elif ls == "dashdot":
+            writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}{%fpt}{%fpt}}{0cm}" % (3*lw, 3*lw, 1*lw, 3*lw))
+        elif "dotted":
+            writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}}{0cm}" % (lw, 3*lw))
+    
+    def _pgf_path(self, gc, path, transform, filled):        
         # build path
         for points, code in path.iter_segments(transform):
             if code == Path.MOVETO:
@@ -253,34 +305,9 @@ class RendererPgf(RendererBase):
             elif code == Path.CURVE4:
                 writeln(self.fh, r"\pgfpathcurveto{\pgfqpointxy{%f}{%f}}{\pgfqpointxy{%f}{%f}}{\pgfqpointxy{%f}{%f}}" % tuple(points))
 
-        # set filling
-        if rgbFace is not None:
-            writeln(self.fh, r"\definecolor{currentfill}{rgb}{%f,%f,%f}" % tuple(rgbFace[:3]))
-            writeln(self.fh, r"\pgfsetfillcolor{currentfill}")
-            action_fill = "fill"
-        else:
-            action_fill = ""
-            
-        # set stroke style
-        lw = gc.get_linewidth()
-        writeln(self.fh, r"\pgfsetlinewidth{%fpt}" % lw)
-        writeln(self.fh, r"\definecolor{currentstroke}{rgb}{%f,%f,%f}" % gc.get_rgb()[:3])
-        writeln(self.fh, r"\pgfsetstrokecolor{currentstroke}")
-        
-        # TODO: have to find the exact dash-distances the other backends are using
-        ls = gc.get_linestyle(None)
-        if ls == "solid":
-            writeln(self.fh, r"\pgfsetdash{}{0pt}")
-        elif ls == "dashed":
-            writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}}{0cm}" % (2.5*lw, 2.5*lw))
-        elif ls == "dashdot":
-            writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}{%fpt}{%fpt}}{0cm}" % (3*lw, 3*lw, 1*lw, 3*lw))
-        elif "dotted":
-            writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}}{0cm}" % (lw, 3*lw))
-                
-        # draw
-        writeln(self.fh, r"\pgfusepath{stroke,%s}" % action_fill)
-        writeln(self.fh, r"\end{pgfscope}")
+        # draw path
+        actions = "stroke,fill" if filled else "stroke"
+        writeln(self.fh, r"\pgfusepath{%s}" % actions)
 
     def draw_image(self, gc, x, y, im):
         # TODO: there is probably a lot to do here like transforming and
@@ -382,14 +409,26 @@ class FigureCanvasPgf(FigureCanvasBase):
         """
         Output pgf commands for drawing the figure so it can be included and
         rendered in latex documents.        
-        """        
+        """
+        
+        header_text = r"""%% Pgf figure exported from matplotlib.
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pgf}
+%%
+%% Make sure to load the required packages in your main document
+%%   \usepackage{pgf}
+%%   \usepackage{pgfsys}
+%"""
         
         w, h = self.figure.get_figwidth(), self.figure.get_figheight()
         dpi = self.figure.dpi
         
         # start a pgfpicture environment and set a bounding box
         fh = codecs.open(filename, "wt", encoding="utf-8")
+        writeln(fh, header_text)
         writeln(fh, r"\begingroup")
+        writeln(fh, r"\makeatletter")
         writeln(fh, r"\begin{pgfpicture}")
         writeln(fh, r"\pgfpathrectangle{\pgfpointorigin}{\pgfqpoint{%fin}{%fin}}" % (w,h))
         writeln(fh, r"\pgfusepath{use as bounding box}")
@@ -405,6 +444,7 @@ class FigureCanvasPgf(FigureCanvasBase):
 
         # end the pgfpicture environment
         writeln(fh, r"\end{pgfpicture}")
+        writeln(fh, r"\makeatother")
         writeln(fh, r"\endgroup")
     
     def print_pdf(self, filename, *args, **kwargs):
