@@ -26,7 +26,7 @@ debug = bool(rcParams.get("pgf.debug", False))
 # use xelatex default font if pgf.font is not set and emit a warning
 fontfamily = rcParams.get("pgf.font", "")
 if not fontfamily:
-    warnings.warn("""No font was specified in rc parameter 'pgf.font'.
+    warnings.warn("""Warning: No font was specified in rc parameter 'pgf.font'.
 Using the XeLaTeX default font might result in incomplete glyph coverage.""", stacklevel=1)
 
 # latex preamble
@@ -39,9 +39,18 @@ displaymath = bool(rcParams.get("pgf.displaymath", True))
 
 ###############################################################################
 
+# this almost made me cry!!!
+# in the end, it's better to use only one unit for all coordinates, since even
+# with the right factors pgf will do the pt-to-inch conversions slightly different
+latex_pt_to_in = 1./72.27
+latex_in_to_pt = 1./latex_pt_to_in
+mpl_pt_to_in = 1./72.
+mpl_in_to_pt = 1./mpl_pt_to_in
+
 # TODO: matplotlib uses \mathdefault sometimes. this is an unknown latex macro
 mathdefault_search = re.compile(r"\\mathdefault")
-mathdefault_replace = lambda s: mathdefault_search.sub(r"\mathnormal", s)
+# do not replace with \mathnormal since this looks odd for the default font
+mathdefault_replace = lambda s: mathdefault_search.sub(r"", s)
 
 # method for reformatting inline math
 math_search = re.compile(r"\$([^\$]+)\$")
@@ -215,6 +224,9 @@ class RendererPgf(RendererBase):
 
     def draw_markers(self, gc, marker_path, marker_trans, path, trans, rgbFace=None):
         writeln(self.fh, r"\begin{pgfscope}")
+        
+        # convert from display units to in
+        f = 1./self.dpi
 
         # set style and clip
         self._pgf_clip(gc)
@@ -222,17 +234,16 @@ class RendererPgf(RendererBase):
      
         # build marker definition
         bl, tr = marker_path.get_extents(marker_trans).get_points()
-        writeln(self.fh, r"\pgfsys@defobject{currentmarker}{\pgfqpointxy{%f}{%f}}{\pgfqpointxy{%f}{%f}}{" % (bl[0],bl[1],tr[0],tr[1]))
-        self._pgf_path(gc, marker_path, marker_trans, filled=bool(rgbFace))
+        coords = bl[0]*f, bl[1]*f, tr[0]*f, tr[1]*f
+        writeln(self.fh, r"\pgfsys@defobject{currentmarker}{\pgfqpoint{%fin}{%fin}}{\pgfqpoint{%fin}{%fin}}{" % coords)
+        self._pgf_path(gc, marker_path, marker_trans, filled=rgbFace is not None)
         writeln(self.fh, r"}")
         
-        # convert from display units to pt, transformshift needs real units
-        f = 72.0/self.dpi
         # draw marker for each vertex
         for point, code in path.iter_segments(trans, simplify=False):
             x, y = tuple(point)
             writeln(self.fh, r"\begin{pgfscope}")
-            writeln(self.fh, r"\pgfsys@transformshift{%fpt}{%fpt}" % (f*x,f*y))
+            writeln(self.fh, r"\pgfsys@transformshift{%fin}{%fin}" % (x*f,y*f))
             writeln(self.fh, r"\pgfsys@useobject{currentmarker}{}")
             writeln(self.fh, r"\end{pgfscope}")
 
@@ -242,15 +253,17 @@ class RendererPgf(RendererBase):
         writeln(self.fh, r"\begin{pgfscope}")
         self._pgf_clip(gc)
         self._pgf_path_styles(gc, rgbFace)
-        self._pgf_path(gc, path, transform, filled=bool(rgbFace))
+        self._pgf_path(gc, path, transform, filled=rgbFace is not None)
         writeln(self.fh, r"\end{pgfscope}")
     
     def _pgf_clip(self, gc):
+        f = 1./self.dpi
         bbox = gc.get_clip_rectangle()
         if bbox:
             p1, p2 = bbox.get_points()
             w, h = p2-p1
-            writeln(self.fh, r"\pgfpathrectangle{\pgfqpointxy{%f}{%f}}{\pgfqpointxy{%f}{%f}} " % (p1[0],p1[1],w,h))
+            coords = p1[0]*f, p1[1]*f, w*f, h*f
+            writeln(self.fh, r"\pgfpathrectangle{\pgfqpoint{%fin}{%fin}}{\pgfqpoint{%fin}{%fin}} " % coords)
             writeln(self.fh, r"\pgfusepath{clip}")
     
     def _pgf_path_styles(self, gc, rgbFace):
@@ -266,44 +279,64 @@ class RendererPgf(RendererBase):
                       "bevel": r"\pgfsetbeveljoin"}
         writeln(self.fh, joinstyles[gc.get_joinstyle()])
         
+        alpha = False
+        
         # filling
-        if rgbFace is not None:
+        has_fill = rgbFace is not None
+        path_is_transparent = gc.get_alpha() != 1.0
+        fill_is_transparent = has_fill and (len(rgbFace) > 3) and (rgbFace[3] != 1.0)
+        alpha = path_is_transparent or fill_is_transparent
+        if has_fill:
             writeln(self.fh, r"\definecolor{currentfill}{rgb}{%f,%f,%f}" % tuple(rgbFace[:3]))
             writeln(self.fh, r"\pgfsetfillcolor{currentfill}")
+        if has_fill and alpha:
+            opacity = gc.get_alpha() * 1.0 if not fill_is_transparent else rgbFace[3]
+            writeln(self.fh, r"\pgfsetfillopacity{%f}" % opacity)
             
         # linewidth and color
-        lw = gc.get_linewidth()
+        lw = gc.get_linewidth() * mpl_in_to_pt * latex_pt_to_in
+        stroke_rgba = gc.get_rgb()
         writeln(self.fh, r"\pgfsetlinewidth{%fpt}" % lw)
-        writeln(self.fh, r"\definecolor{currentstroke}{rgb}{%f,%f,%f}" % gc.get_rgb()[:3])
+        writeln(self.fh, r"\definecolor{currentstroke}{rgb}{%f,%f,%f}" % stroke_rgba[:3])
         writeln(self.fh, r"\pgfsetstrokecolor{currentstroke}")
+        if gc.get_alpha() != 1.0:
+            alpha = True
+            writeln(self.fh, r"\pgfsetstrokeopacity{%f}" % gc.get_alpha())
+        
+        # warn if using transparency
+        if alpha: warnings.warn("Warning: This figure uses transparency effects. Some print drivers do not handle this correctly.\n")
         
         # line style
         ls = gc.get_linestyle(None)
         if ls == "solid":
             writeln(self.fh, r"\pgfsetdash{}{0pt}")
         elif ls == "dashed":
-            writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}}{0cm}" % (2.5*lw, 2.5*lw))
+            writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}}{0pt}" % (2.5*lw, 2.5*lw))
         elif ls == "dashdot":
-            writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}{%fpt}{%fpt}}{0cm}" % (3*lw, 3*lw, 1*lw, 3*lw))
+            writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}{%fpt}{%fpt}}{0pt}" % (3*lw, 3*lw, 1*lw, 3*lw))
         elif "dotted":
-            writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}}{0cm}" % (lw, 3*lw))
+            writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}}{0pt}" % (lw, 3*lw))
     
-    def _pgf_path(self, gc, path, transform, filled):        
+    def _pgf_path(self, gc, path, transform, filled):
+        f = 1./self.dpi
         # build path
         for points, code in path.iter_segments(transform):
             if code == Path.MOVETO:
                 x, y = tuple(points)
-                writeln(self.fh, r"\pgfpathmoveto{\pgfqpointxy{%f}{%f}}" % (x,y))
+                writeln(self.fh, r"\pgfpathmoveto{\pgfqpoint{%fin}{%fin}}" % (f*x,f*y))
             elif code == Path.CLOSEPOLY:
                 writeln(self.fh, r"\pgfpathclose")
             elif code == Path.LINETO:
                 x, y = tuple(points)
-                writeln(self.fh, r"\pgfpathlineto{\pgfqpointxy{%f}{%f}}" % (x,y))
+                writeln(self.fh, r"\pgfpathlineto{\pgfqpoint{%fin}{%fin}}" % (f*x,f*y))
             elif code == Path.CURVE3:
                 cx, cy, px, py = tuple(points)
-                writeln(self.fh, r"\pgfpathquadraticcurveto{\pgfqpointxy{%f}{%f}}{\pgfqpointxy{%f}{%f}}" % tuple(points))
+                coords = cx*f, cy*f, px*f, py*f
+                writeln(self.fh, r"\pgfpathquadraticcurveto{\pgfqpoint{%fin}{%fin}}{\pgfqpoint{%fin}{%fin}}" % coords)
             elif code == Path.CURVE4:
-                writeln(self.fh, r"\pgfpathcurveto{\pgfqpointxy{%f}{%f}}{\pgfqpointxy{%f}{%f}}{\pgfqpointxy{%f}{%f}}" % tuple(points))
+                c1x, c1y, c2x, c2y, px, py = tuple(points)
+                coords = c1x*f, c1y*f, c2x*f, c2y*f, px*f, py*f
+                writeln(self.fh, r"\pgfpathcurveto{\pgfqpoint{%fin}{%fin}}{\pgfqpoint{%fin}{%fin}}{\pgfqpoint{%fin}{%fin}}" % coords)
 
         # draw path
         actions = "stroke,fill" if filled else "stroke"
@@ -314,6 +347,8 @@ class RendererPgf(RendererBase):
         # clipping the image, but there is no documentation for the behavior
         # of this function. however, this simple implementation works for
         # basic needs.
+        
+        f = 1./self.dpi
         
         # filename for this image
         path = os.path.dirname(self.fh.name)
@@ -327,39 +362,41 @@ class RendererPgf(RendererBase):
         _png.write_png(buf, cols, rows, os.path.join(path, fname_img))
         # include the png in the pgf picture
         h, w = im.get_size_out()
-        h, w = h/self.dpi, w/self.dpi
-        x, y = x/self.dpi, y/self.dpi
+        h, w = h*f, w*f
+        x, y = x*f, y*f
         writeln(self.fh, r"\pgftext[at=\pgfqpoint{%fin}{%fin},left,bottom]{\pgfimage[interpolate=true,width=%fin,height=%fin]{%s}}" % (x, y, w, h, fname_img))
 
     def draw_text(self, gc, x, y, s, prop, angle, ismath=False):
         if not self.draw_texts: return
+        # WARNING: this code path is unused right now
 
         # replace unknown \mathdefault command from matplotlib
         s = mathdefault_replace(s)
 
         # check if the math is supposed to be displaystyled
         if displaymath: s = math_to_displaystyle(s)
-        
-        # TODO: the text coordinates are given in pt units, right?
-        x = x*72.0/self.dpi
-        y = y*72.0/self.dpi
+
+        x = x * 1./self.dpi
+        y = y * 1./self.dpi
         # include commands for changing the fontsize
         fontsize = prop.get_size_in_points()
-        s = ur"{\fontsize{%f}{%f}\selectfont{%s}}" % (fontsize, fontsize*1.2, s)
+        s = ur"{\fontsize{%f}{%f}\selectfont %s}" % (fontsize, fontsize*1.2, s)
         # draw text at given coordinates
-        writeln(self.fh, r"\pgftext[left,bottom,x=%f,y=%f,rotate=%f]{%s}\n" % (x,y,angle,s))
+        writeln(self.fh, "\\pgftext[left,bottom,x=%fin,y=%fin,rotate=%f]{%s}\n" % (x,y,angle,s))
 
     def get_text_width_height_descent(self, s, prop, ismath):
-        # TODO: except from reading the fontsize, all text properties are
-        # ignored for now.
+        # TODO: all text properties but the fontsize are ignored for now.
         fontsize = prop.get_size_in_points()
         
         # check if the math is supposed to be displaystyled
         if displaymath: s = math_to_displaystyle(s)
         
-        # get text metrics in units of pt, convert to display units
+        # replace unknown matplotlib command
+        s = mathdefault_replace(s)
+        
+        # get text metrics in units of latex pt, convert to display units
         w, h, d = self.xelatexManager.get_width_height_descent(s, fontsize)
-        f = self.dpi/72.0
+        f = latex_pt_to_in * self.dpi
         return w*f, h*f, d*f
 
     def flipy(self):
@@ -420,9 +457,8 @@ class FigureCanvasPgf(FigureCanvasBase):
 %%   \usepackage{pgf}
 %%   \usepackage{pgfsys}
 %"""
-        
+        # figure size in units of in
         w, h = self.figure.get_figwidth(), self.figure.get_figheight()
-        dpi = self.figure.dpi
         
         # start a pgfpicture environment and set a bounding box
         fh = codecs.open(filename, "wt", encoding="utf-8")
@@ -432,8 +468,6 @@ class FigureCanvasPgf(FigureCanvasBase):
         writeln(fh, r"\begin{pgfpicture}")
         writeln(fh, r"\pgfpathrectangle{\pgfpointorigin}{\pgfqpoint{%fin}{%fin}}" % (w,h))
         writeln(fh, r"\pgfusepath{use as bounding box}")
-        writeln(fh, r"\pgfsetxvec{\pgfqpoint{%fin}{0in}}" % (1./dpi))
-        writeln(fh, r"\pgfsetyvec{\pgfqpoint{0in}{%fin}}" % (1./dpi))
         
         # for pgf output, do not process text elements using the Renderer
         renderer = RendererPgf(self.figure, fh, draw_texts=False)
@@ -479,7 +513,8 @@ class FigureCanvasPgf(FigureCanvasBase):
             cmd = 'xelatex -interaction=nonstopmode "%s" > figure.stdout' % ("figure.tex")
             exit_status = os.system(cmd)
             if exit_status:
-                raise RuntimeError("XeLaTeX was not able to process your file")
+                shutil.copyfile("figure.stdout", target+".err")
+                raise RuntimeError("XeLaTeX was not able to process your file.\nXeLaTeX stdout saved to %s" % (target+".err"))
             shutil.copyfile("figure.pdf", target)
         finally:
             shutil.rmtree(tmpdir)
@@ -518,18 +553,17 @@ class FigureCanvasPgf(FigureCanvasBase):
             angle = text.get_rotation()
             transform = text.get_transform()
             x, y = transform.transform_point(text.get_position())
-            # TODO: why are the coordinate's units different from path units?
-            x *= 72./self.figure.dpi
-            y *= 72./self.figure.dpi
-            # TODO: positioning behavior unknown for rotated elements, right
-            # now only the case for 90deg rotation is supported
+            x = x * 1.0 / self.figure.dpi
+            y = y * 1.0 / self.figure.dpi
+            # TODO: positioning behavior unknown for rotated elements
+            # right now only the alignment for 90deg rotations is correct
             if angle == 90.:
                 align = rvalign[text.get_va()] + "," + rhalign[text.get_ha()]
             else:
                 align = valign[text.get_va()] + "," + halign[text.get_ha()]
     
             s = ur"{\fontsize{%f}{%f}\selectfont %s}" % (fontsize, fontsize*1.2, s)
-            writeln(fh, ur"\pgftext[%s,x=%f,y=%f,rotate=%f]{%s}" % (align,x,y,angle,s))
+            writeln(fh, ur"\pgftext[%s,x=%fin,y=%fin,rotate=%f]{%s}" % (align,x,y,angle,s))
     
     def get_renderer(self):
         return RendererPgf(self.figure, None, draw_texts=False)
