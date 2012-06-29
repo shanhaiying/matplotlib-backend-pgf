@@ -23,6 +23,9 @@ from matplotlib import _png, rcParams
 # debug switch
 debug = bool(rcParams.get("pgf.debug", False))
 
+# debug switch
+anchoredtext = bool(rcParams.get("pgf.anchoredtext", False))
+
 # use xelatex default font if pgf.font is not set and emit a warning
 fontfamily = rcParams.get("pgf.font", "")
 if not fontfamily:
@@ -236,7 +239,8 @@ class RendererPgf(RendererBase):
         bl, tr = marker_path.get_extents(marker_trans).get_points()
         coords = bl[0]*f, bl[1]*f, tr[0]*f, tr[1]*f
         writeln(self.fh, r"\pgfsys@defobject{currentmarker}{\pgfqpoint{%fin}{%fin}}{\pgfqpoint{%fin}{%fin}}{" % coords)
-        self._pgf_path(gc, marker_path, marker_trans, filled=rgbFace is not None)
+        self._pgf_path(marker_path, marker_trans)
+        self._pgf_path_draw(fill=rgbFace is not None)
         writeln(self.fh, r"}")
         
         # draw marker for each vertex
@@ -253,17 +257,25 @@ class RendererPgf(RendererBase):
         writeln(self.fh, r"\begin{pgfscope}")
         self._pgf_clip(gc)
         self._pgf_path_styles(gc, rgbFace)
-        self._pgf_path(gc, path, transform, filled=rgbFace is not None)
+        self._pgf_path(path, transform)
+        self._pgf_path_draw(fill=rgbFace is not None)
         writeln(self.fh, r"\end{pgfscope}")
     
     def _pgf_clip(self, gc):
         f = 1./self.dpi
+        # check for clip box
         bbox = gc.get_clip_rectangle()
         if bbox:
             p1, p2 = bbox.get_points()
             w, h = p2-p1
             coords = p1[0]*f, p1[1]*f, w*f, h*f
             writeln(self.fh, r"\pgfpathrectangle{\pgfqpoint{%fin}{%fin}}{\pgfqpoint{%fin}{%fin}} " % coords)
+            writeln(self.fh, r"\pgfusepath{clip}")
+
+        # check for clip path
+        clippath, clippath_trans = gc.get_clip_path()
+        if clippath is not None:
+            self._pgf_path(clippath, clippath_trans)
             writeln(self.fh, r"\pgfusepath{clip}")
     
     def _pgf_path_styles(self, gc, rgbFace):
@@ -294,7 +306,7 @@ class RendererPgf(RendererBase):
             writeln(self.fh, r"\pgfsetfillopacity{%f}" % opacity)
             
         # linewidth and color
-        lw = gc.get_linewidth() * mpl_in_to_pt * latex_pt_to_in
+        lw = gc.get_linewidth() * mpl_pt_to_in * latex_in_to_pt
         stroke_rgba = gc.get_rgb()
         writeln(self.fh, r"\pgfsetlinewidth{%fpt}" % lw)
         writeln(self.fh, r"\definecolor{currentstroke}{rgb}{%f,%f,%f}" % stroke_rgba[:3])
@@ -317,7 +329,7 @@ class RendererPgf(RendererBase):
         elif "dotted":
             writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}}{0pt}" % (lw, 3*lw))
     
-    def _pgf_path(self, gc, path, transform, filled):
+    def _pgf_path(self, path, transform):
         f = 1./self.dpi
         # build path
         for points, code in path.iter_segments(transform):
@@ -338,18 +350,18 @@ class RendererPgf(RendererBase):
                 coords = c1x*f, c1y*f, c2x*f, c2y*f, px*f, py*f
                 writeln(self.fh, r"\pgfpathcurveto{\pgfqpoint{%fin}{%fin}}{\pgfqpoint{%fin}{%fin}}{\pgfqpoint{%fin}{%fin}}" % coords)
 
-        # draw path
-        actions = "stroke,fill" if filled else "stroke"
-        writeln(self.fh, r"\pgfusepath{%s}" % actions)
+    def _pgf_path_draw(self, stroke=True, fill=False):
+        actions = []
+        if stroke: actions.append("stroke")
+        if fill: actions.append("fill")
+        writeln(self.fh, r"\pgfusepath{%s}" % ",".join(actions))
 
     def draw_image(self, gc, x, y, im):
         # TODO: there is probably a lot to do here like transforming and
         # clipping the image, but there is no documentation for the behavior
         # of this function. however, this simple implementation works for
         # basic needs.
-        
-        f = 1./self.dpi
-        
+                
         # filename for this image
         path = os.path.dirname(self.fh.name)
         fname = os.path.splitext(os.path.basename(self.fh.name))[0]
@@ -360,15 +372,17 @@ class RendererPgf(RendererBase):
         im.flipud_out()
         rows, cols, buf = im.as_rgba_str()
         _png.write_png(buf, cols, rows, os.path.join(path, fname_img))
-        # include the png in the pgf picture
+
+        # pgf out
+        writeln(self.fh, r"\begin{pgfscope}")
+        self._pgf_clip(gc)
         h, w = im.get_size_out()
-        h, w = h*f, w*f
-        x, y = x*f, y*f
-        writeln(self.fh, r"\pgftext[at=\pgfqpoint{%fin}{%fin},left,bottom]{\pgfimage[interpolate=true,width=%fin,height=%fin]{%s}}" % (x, y, w, h, fname_img))
+        f = 1./self.dpi # from display coords to inch
+        writeln(self.fh, r"\pgftext[at=\pgfqpoint{%fin}{%fin},left,bottom]{\pgfimage[interpolate=true,width=%fin,height=%fin]{%s}}" % (x*f, y*f, w*f, h*f, fname_img))
+        writeln(self.fh, r"\end{pgfscope}")
 
     def draw_text(self, gc, x, y, s, prop, angle, ismath=False):
         if not self.draw_texts: return
-        # WARNING: this code path is unused right now
 
         # replace unknown \mathdefault command from matplotlib
         s = mathdefault_replace(s)
@@ -396,7 +410,9 @@ class RendererPgf(RendererBase):
         
         # get text metrics in units of latex pt, convert to display units
         w, h, d = self.xelatexManager.get_width_height_descent(s, fontsize)
-        f = latex_pt_to_in * self.dpi
+        # TODO: this should be latex_pt_to_in instead of mpl_pt_to_in
+        # but having a little bit morespace around the text looks better
+        f = mpl_pt_to_in * self.dpi
         return w*f, h*f, d*f
 
     def flipy(self):
@@ -470,11 +486,11 @@ class FigureCanvasPgf(FigureCanvasBase):
         writeln(fh, r"\pgfusepath{use as bounding box}")
         
         # for pgf output, do not process text elements using the Renderer
-        renderer = RendererPgf(self.figure, fh, draw_texts=False)
+        renderer = RendererPgf(self.figure, fh, draw_texts=not anchoredtext)
         self.figure.draw(renderer)
         # manually extract text elements from the figure and draw them
         # TODO: this wouldn't be neccessary if draw_text received Text instances as documented
-        self._render_texts_pgf(fh)
+        if anchoredtext: self._render_texts_pgf(fh)
 
         # end the pgfpicture environment
         writeln(fh, r"\end{pgfpicture}")
