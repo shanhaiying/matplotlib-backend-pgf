@@ -16,6 +16,8 @@ from matplotlib.figure import Figure
 from matplotlib.text import Text
 from matplotlib.path import Path
 from matplotlib import _png, rcParams
+from matplotlib import font_manager
+from matplotlib.ft2font import FT2Font
 
 ###############################################################################
 # settings read from rc
@@ -23,53 +25,96 @@ from matplotlib import _png, rcParams
 # debug switch
 debug = bool(rcParams.get("pgf.debug", False))
 
-# debug switch
-anchoredtext = bool(rcParams.get("pgf.anchoredtext", False))
+# font configuration
+rcfonts = rcParams.get("pgf.rcfonts", True)
+latex_fontspec = []
+if not rcfonts:
+    # use standard LaTeX fonts and use default serif font
+    rcParams["font.family"] = "serif"
+else:
+    # build a list of system font families
+    system_fonts = [FT2Font(f).family_name for f in font_manager.findSystemFonts()]
 
-# use xelatex default font if pgf.font is not set and emit a warning
-fontfamily = rcParams.get("pgf.font", "")
-if not fontfamily:
-    warnings.warn("""Warning: No font was specified in rc parameter 'pgf.font'.
-Using the XeLaTeX default font might result in incomplete glyph coverage.""", stacklevel=1)
+    # try to find fonts from rc parameters
+    families = ["serif", "sans-serif", "monospace"]
+    fontspecs = [r"\setmainfont{%s}", r"\setsansfont{%s}", r"\setmonofont{%s}"]
+    for family, fontspec in zip(families, fontspecs):
+        matches = [f for f in rcParams["font."+family] if f in system_fonts]
+        if matches:
+            latex_fontspec.append(fontspec % matches[0])
+        else:
+            warnings.warn("No fonts found in font.%s, using LaTeX default.\n" % family)
+    
+    if debug:
+        print "font specification:", latex_fontspec
+latex_fontspec = "\n".join(latex_fontspec)
 
-# latex preamble
+# LaTeX preamble
 latex_preamble = rcParams.get("pgf.preamble", "")
 if type(latex_preamble) == list:
     latex_preamble = "\n".join(latex_preamble)
 
-# is math text to be displaystyled? (large symbols)
-displaymath = bool(rcParams.get("pgf.displaymath", True))
-
 ###############################################################################
 
-# this almost made me cry!!!
-# in the end, it's better to use only one unit for all coordinates, since even
-# with the right factors pgf will do the pt-to-inch conversions slightly different
+# This almost made me cry!!!
+# In the end, it's better to use only one unit for all coordinates, since the
+# arithmetic in latex seems to produce inaccurate conversions.
 latex_pt_to_in = 1./72.27
 latex_in_to_pt = 1./latex_pt_to_in
 mpl_pt_to_in = 1./72.
 mpl_in_to_pt = 1./mpl_pt_to_in
 
-# TODO: matplotlib uses \mathdefault sometimes. this is an unknown latex macro
+###############################################################################
+# helper functions
+
 mathdefault_search = re.compile(r"\\mathdefault")
-# do not replace with \mathnormal since this looks odd for the default font
-mathdefault_replace = lambda s: mathdefault_search.sub(r"", s)
+inlinemath_search = re.compile(r"(?<!\\)\$(.*?)(?<!\\)\$")
 
-# method for reformatting inline math
-math_search = re.compile(r"\$([^\$]+)\$")
-math_replace = lambda match: r"\(\displaystyle %s\)" % match.group(1)
-def math_to_displaystyle(text):
+def common_texification(text):
     """
-    This function replaces any inline math with a inline math environment in
-    displaystyle.
+    Do some necessary and/or useful substitutions for texts to be included in
+    LaTeX documents.
     """
-    return math_search.sub(math_replace, text)
+    
+    # Sometimes, matplotlib uses the unknown command \mathdefault.
+    # Not using \mathnormal instead since this looks odd for the default font.
+    text = mathdefault_search.sub(r"", text)
+    
+    # Make inline math displaystyled.
+    math_replace = lambda match: r"\(\displaystyle %s\)" % match.group(1)
+    text = inlinemath_search.sub(math_replace, text)
+    
+    # Escape percent sign
+    text = re.sub(r"(?<!\\)%", r"\%", text)
+    
+    return text
 
-# every line of a file included with \input must be terminated with %
-# if not, latex will create additional vertical spaces for some reason
 def writeln(fh, line):
+    # every line of a file included with \input must be terminated with %
+    # if not, latex will create additional vertical spaces for some reason
     fh.write(line)
     fh.write("%\n")
+
+def _font_properties_str(prop):
+    # translate font properties to latex commands, return as string
+    commands = []
+    
+    size = prop.get_size_in_points()
+    commands.append(r"\fontsize{%f}{%f}" % (size, size*1.2))
+    
+    styles = {"normal": r"", "italic": r"\itshape", "oblique": r"\slshape"}
+    commands.append(styles[prop.get_style()])
+
+    families = {"serif": r"\rmfamily", "sans-serif": r"\sffamily", "monospace": r"\ttfamily"}
+    commands.append(families.get(prop.get_family()[0], ""))
+    
+    boldstyles = ["semibold", "demibold", "demi", "bold", "heavy", "extra bold", "black"]
+    if prop.get_weight() in boldstyles: commands.append(r"\bfseries")
+
+    commands.append(r"\selectfont")
+    
+    return "".join(commands)
+
 
 class XelatexError(Exception):
     def __init__(self, message, latex_output = ""):
@@ -88,7 +133,6 @@ class XelatexManager:
         # create latex header with some content, else latex will load some
         # math fonts later when we don't expect the additional output on stdout
         # TODO: is this sufficient?
-        setmainfont = r"\setmainfont{%s}" % fontfamily if fontfamily else ""
         latex_header = u"""\\documentclass{minimal}
 %s
 \\usepackage{fontspec}
@@ -96,7 +140,7 @@ class XelatexManager:
 \\begin{document}
 text $math \mu$ %% force latex to load fonts now
 \\typeout{pgf_backend_query_start}
-""" % (latex_preamble, setmainfont)
+""" % (latex_preamble, latex_fontspec)
 
         latex_end = """
 \\makeatletter
@@ -153,18 +197,17 @@ text $math \mu$ %% force latex to load fonts now
                 raise XelatexError("XeLaTeX halted", u"".join(buf))
         return "".join(buf)
 
-    def get_width_height_descent(self, text, fontsize):
+    def get_width_height_descent(self, text, prop):
         """
         Get the width, total height and descent for a text typesetted by the
         current Xelatex environment.
         """        
         if debug: print "obtain metrics for: %s" % text
-        
-        # replace unknown \mathdefault command from matplotlib
-        text = mathdefault_replace(text)
-        
-        # change fontsize and define textbox
-        textbox = u"\\sbox0{\\fontsize{%f}{%f}\\selectfont{%s}}\n" % (fontsize, fontsize*1.2, text)
+
+        # apply font properties and define textbox
+        prop_cmds = _font_properties_str(prop)
+        textbox = u"\\sbox0{%s %s}\n" % (prop_cmds, text)
+
         # check cache
         if textbox in self.str_cache:
             return self.str_cache[textbox]
@@ -232,15 +275,16 @@ class RendererPgf(RendererBase):
         f = 1./self.dpi
 
         # set style and clip
-        self._pgf_clip(gc)
-        self._pgf_path_styles(gc, rgbFace)
+        self._print_pgf_clip(gc)
+        self._print_pgf_path_styles(gc, rgbFace)
      
         # build marker definition
         bl, tr = marker_path.get_extents(marker_trans).get_points()
         coords = bl[0]*f, bl[1]*f, tr[0]*f, tr[1]*f
         writeln(self.fh, r"\pgfsys@defobject{currentmarker}{\pgfqpoint{%fin}{%fin}}{\pgfqpoint{%fin}{%fin}}{" % coords)
-        self._pgf_path(marker_path, marker_trans)
-        self._pgf_path_draw(fill=rgbFace is not None)
+        self._print_pgf_path(marker_path, marker_trans)
+        self._pgf_path_draw(stroke=gc.get_linewidth() != 0.0,
+                            fill=rgbFace is not None)
         writeln(self.fh, r"}")
         
         # draw marker for each vertex
@@ -255,13 +299,14 @@ class RendererPgf(RendererBase):
     
     def draw_path(self, gc, path, transform, rgbFace=None):
         writeln(self.fh, r"\begin{pgfscope}")
-        self._pgf_clip(gc)
-        self._pgf_path_styles(gc, rgbFace)
-        self._pgf_path(path, transform)
-        self._pgf_path_draw(fill=rgbFace is not None)
+        self._print_pgf_clip(gc)
+        self._print_pgf_path_styles(gc, rgbFace)
+        self._print_pgf_path(path, transform)
+        self._pgf_path_draw(stroke=gc.get_linewidth() != 0.0,
+                            fill=rgbFace is not None)
         writeln(self.fh, r"\end{pgfscope}")
     
-    def _pgf_clip(self, gc):
+    def _print_pgf_clip(self, gc):
         f = 1./self.dpi
         # check for clip box
         bbox = gc.get_clip_rectangle()
@@ -275,36 +320,33 @@ class RendererPgf(RendererBase):
         # check for clip path
         clippath, clippath_trans = gc.get_clip_path()
         if clippath is not None:
-            self._pgf_path(clippath, clippath_trans)
+            self._print_pgf_path(clippath, clippath_trans)
             writeln(self.fh, r"\pgfusepath{clip}")
     
-    def _pgf_path_styles(self, gc, rgbFace):
+    def _print_pgf_path_styles(self, gc, rgbFace):
         # cap style
         capstyles = {"butt": r"\pgfsetbuttcap",
                      "round": r"\pgfsetroundcap",
                      "projecting": r"\pgfsetrectcap"}
         writeln(self.fh, capstyles[gc.get_capstyle()])
-
+        
         # join style
         joinstyles = {"miter": r"\pgfsetmiterjoin",
                       "round": r"\pgfsetroundjoin",
                       "bevel": r"\pgfsetbeveljoin"}
         writeln(self.fh, joinstyles[gc.get_joinstyle()])
         
-        alpha = False
-        
         # filling
         has_fill = rgbFace is not None
         path_is_transparent = gc.get_alpha() != 1.0
         fill_is_transparent = has_fill and (len(rgbFace) > 3) and (rgbFace[3] != 1.0)
-        alpha = path_is_transparent or fill_is_transparent
         if has_fill:
             writeln(self.fh, r"\definecolor{currentfill}{rgb}{%f,%f,%f}" % tuple(rgbFace[:3]))
             writeln(self.fh, r"\pgfsetfillcolor{currentfill}")
-        if has_fill and alpha:
+        if has_fill and (path_is_transparent or fill_is_transparent):
             opacity = gc.get_alpha() * 1.0 if not fill_is_transparent else rgbFace[3]
             writeln(self.fh, r"\pgfsetfillopacity{%f}" % opacity)
-            
+        
         # linewidth and color
         lw = gc.get_linewidth() * mpl_pt_to_in * latex_in_to_pt
         stroke_rgba = gc.get_rgb()
@@ -312,11 +354,7 @@ class RendererPgf(RendererBase):
         writeln(self.fh, r"\definecolor{currentstroke}{rgb}{%f,%f,%f}" % stroke_rgba[:3])
         writeln(self.fh, r"\pgfsetstrokecolor{currentstroke}")
         if gc.get_alpha() != 1.0:
-            alpha = True
             writeln(self.fh, r"\pgfsetstrokeopacity{%f}" % gc.get_alpha())
-        
-        # warn if using transparency
-        if alpha: warnings.warn("Warning: This figure uses transparency effects. Some print drivers do not handle this correctly.\n")
         
         # line style
         ls = gc.get_linestyle(None)
@@ -329,7 +367,7 @@ class RendererPgf(RendererBase):
         elif "dotted":
             writeln(self.fh, r"\pgfsetdash{{%fpt}{%fpt}}{0pt}" % (lw, 3*lw))
     
-    def _pgf_path(self, path, transform):
+    def _print_pgf_path(self, path, transform):
         f = 1./self.dpi
         # build path
         for points, code in path.iter_segments(transform):
@@ -357,25 +395,21 @@ class RendererPgf(RendererBase):
         writeln(self.fh, r"\pgfusepath{%s}" % ",".join(actions))
 
     def draw_image(self, gc, x, y, im):
-        # TODO: there is probably a lot to do here like transforming and
-        # clipping the image, but there is no documentation for the behavior
-        # of this function. however, this simple implementation works for
-        # basic needs.
-                
-        # filename for this image
+        # TODO: Almost no documentation for the behavior of this function.
+        #       Something missing?
+        
+        # save the images to png files
         path = os.path.dirname(self.fh.name)
         fname = os.path.splitext(os.path.basename(self.fh.name))[0]
         fname_img = "%s-img%d.png" % (fname, self.image_counter)
         self.image_counter += 1
-        # write image to a png file
-        # for some reason, the image must be flipped upside down
         im.flipud_out()
         rows, cols, buf = im.as_rgba_str()
         _png.write_png(buf, cols, rows, os.path.join(path, fname_img))
 
-        # pgf out
+        # reference the image in the pgf picture
         writeln(self.fh, r"\begin{pgfscope}")
-        self._pgf_clip(gc)
+        self._print_pgf_clip(gc)
         h, w = im.get_size_out()
         f = 1./self.dpi # from display coords to inch
         writeln(self.fh, r"\pgftext[at=\pgfqpoint{%fin}{%fin},left,bottom]{\pgfimage[interpolate=true,width=%fin,height=%fin]{%s}}" % (x*f, y*f, w*f, h*f, fname_img))
@@ -384,34 +418,36 @@ class RendererPgf(RendererBase):
     def draw_text(self, gc, x, y, s, prop, angle, ismath=False):
         if not self.draw_texts: return
 
-        # replace unknown \mathdefault command from matplotlib
-        s = mathdefault_replace(s)
+        s = common_texification(s)
 
-        # check if the math is supposed to be displaystyled
-        if displaymath: s = math_to_displaystyle(s)
+        # apply font properties
+        prop_cmds = _font_properties_str(prop)
+        s = ur"{%s %s}" % (prop_cmds, s)
 
+        # draw text at given coordinates
         x = x * 1./self.dpi
         y = y * 1./self.dpi
-        # include commands for changing the fontsize
-        fontsize = prop.get_size_in_points()
-        s = ur"{\fontsize{%f}{%f}\selectfont %s}" % (fontsize, fontsize*1.2, s)
-        # draw text at given coordinates
+        writeln(self.fh, r"\begin{pgfscope}")
+        alpha = gc.get_alpha()
+        if alpha != 1.0:
+            writeln(self.fh, r"\pgfsetfillopacity{%f}" % alpha)
+        stroke_rgb = tuple(gc.get_rgb())[:3]
+        if stroke_rgb != (0, 0, 0):
+            writeln(self.fh, r"\definecolor{textcolor}{rgb}{%f,%f,%f}" % stroke_rgb)
+            writeln(self.fh, r"\pgfsetstrokecolor{textcolor}")
+            writeln(self.fh, r"\pgfsetfillcolor{textcolor}")
         writeln(self.fh, "\\pgftext[left,bottom,x=%fin,y=%fin,rotate=%f]{%s}\n" % (x,y,angle,s))
+        writeln(self.fh, r"\end{pgfscope}")
 
-    def get_text_width_height_descent(self, s, prop, ismath):
-        # TODO: all text properties but the fontsize are ignored for now.
-        fontsize = prop.get_size_in_points()
-        
+    def get_text_width_height_descent(self, s, prop, ismath):       
         # check if the math is supposed to be displaystyled
-        if displaymath: s = math_to_displaystyle(s)
-        
-        # replace unknown matplotlib command
-        s = mathdefault_replace(s)
-        
+        s = common_texification(s)
+
         # get text metrics in units of latex pt, convert to display units
-        w, h, d = self.xelatexManager.get_width_height_descent(s, fontsize)
+        w, h, d = self.xelatexManager.get_width_height_descent(s, prop)
         # TODO: this should be latex_pt_to_in instead of mpl_pt_to_in
-        # but having a little bit morespace around the text looks better
+        # but having a little bit morespace around the text looks better,
+        # plus the bounding box reported by xelatex is VERY narrow
         f = mpl_pt_to_in * self.dpi
         return w*f, h*f, d*f
 
@@ -485,12 +521,14 @@ class FigureCanvasPgf(FigureCanvasBase):
         writeln(fh, r"\pgfpathrectangle{\pgfpointorigin}{\pgfqpoint{%fin}{%fin}}" % (w,h))
         writeln(fh, r"\pgfusepath{use as bounding box}")
         
-        # for pgf output, do not process text elements using the Renderer
-        renderer = RendererPgf(self.figure, fh, draw_texts=not anchoredtext)
+        # TODO: Matplotlib does not send Text instances to the renderer as documented.
+        # This means that we cannot anchor the text elements correctly so that
+        # they stay aligned when changing the font size later.
+        # Manually iterating through all text instances of a figure has proven
+        # to be too much work since matplotlib behaves really weird sometimes.
+        # -> _render_texts_pgf
+        renderer = RendererPgf(self.figure, fh, draw_texts=True)
         self.figure.draw(renderer)
-        # manually extract text elements from the figure and draw them
-        # TODO: this wouldn't be neccessary if draw_text received Text instances as documented
-        if anchoredtext: self._render_texts_pgf(fh)
 
         # end the pgfpicture environment
         writeln(fh, r"\end{pgfpicture}")
@@ -510,7 +548,6 @@ class FigureCanvasPgf(FigureCanvasBase):
             os.chdir(tmpdir)
             self.print_pgf("figure.pgf")
 
-            setmainfont = r"\setmainfont{%s}" % fontfamily if fontfamily else ""
             latexcode = r"""
 \documentclass[12pt]{minimal}
 \usepackage[paperwidth=%fin, paperheight=%fin, margin=0in]{geometry}
@@ -522,7 +559,7 @@ class FigureCanvasPgf(FigureCanvasBase):
 \begin{document}
 \centering
 \input{figure.pgf}
-\end{document}""" % (w, h, latex_preamble, setmainfont)
+\end{document}""" % (w, h, latex_preamble, latex_fontspec)
             with codecs.open("figure.tex", "wt", "utf-8") as fh:
                 fh.write(latexcode)
             
@@ -562,8 +599,7 @@ class FigureCanvasPgf(FigureCanvasBase):
             s = text.get_text()
             if not s or not text.get_visible(): continue
         
-            s = mathdefault_replace(s)
-            if displaymath: s = math_to_displaystyle(s)
+            s = common_texification(s)
         
             fontsize = text.get_fontsize()
             angle = text.get_rotation()

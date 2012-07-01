@@ -3,9 +3,15 @@
 import matplotlib
 
 use_pgf = True
+
 if use_pgf:
     matplotlib.use('module://backend_pgf')
-    matplotlib.rcParams.update({"pgf.font": "CMU Serif"})
+    # set fonts using matplotlib rc
+    matplotlib.rcParams.update({"pgf.rcfonts": True})
+    matplotlib.rcParams["font.family"] = "serif"
+    matplotlib.rcParams["font.serif"] = ["CMU Serif"]
+    matplotlib.rcParams["font.sans-serif"] = ["CMU Sans Serif"]
+    matplotlib.rcParams["font.monospace"] = ["CMU Concrete"]
     #matplotlib.rcParams.update({"pgf.preamble": r"\usepackage{mathpazo}"})
 else:
     matplotlib.rcParams["text.latex.preamble"] = r"""
