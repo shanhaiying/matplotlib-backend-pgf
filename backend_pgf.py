@@ -431,6 +431,7 @@ class RendererPgf(RendererBase):
         alpha = gc.get_alpha()
         if alpha != 1.0:
             writeln(self.fh, r"\pgfsetfillopacity{%f}" % alpha)
+            writeln(self.fh, r"\pgfsetstrokeopacity{%f}" % alpha)
         stroke_rgb = tuple(gc.get_rgb())[:3]
         if stroke_rgb != (0, 0, 0):
             writeln(self.fh, r"\definecolor{textcolor}{rgb}{%f,%f,%f}" % stroke_rgb)
