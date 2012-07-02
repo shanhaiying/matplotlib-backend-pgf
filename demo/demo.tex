@@ -28,8 +28,8 @@ The following figure contains greek unicode letters, math text and normal text. 
 \newpage
 \subsection*{Pgf Backend with Xelatex}
 
-For real unicode support the use of Xelatex or Lualatex is mandatory. In order to use these new Latex implementations in Matplotlib, a new backend is required as the \textit{pstricks} methods for drawing the figures are not available anymore. The \textit{pgfpicture} package offers an alternative that works for Pdflatex, Xelatex and Lualatex alike. These commands can be included in Latex documents directly (\textbackslash input) or be pre-compiled to PDF for inclusion (\textbackslash
- includegraphics). For a most consistent appearance, the font \textit{Computer Modern Unicode} available at \url{http://sourceforge.net/projects/cm-unicode/} must be installed, since the default Latex font misses most of the unicode letters. Any other installed system font will work as well, although one has to find a matching package for the math fonts then.
+For real unicode support the use of Xelatex or Lualatex is mandatory. In order to use these new Latex implementations in Matplotlib, a new backend is required as the \textit{pstricks} methods for drawing the figures are not available anymore. The \textit{pgf} package offers an alternative that works for Pdflatex, Xelatex and Lualatex alike. Figures are drawn in \textit{pgfpicture} environments and can be included in Latex documents directly (\textbackslash input) or be pre-compiled to PDF for inclusion (\textbackslash
+ includegraphics). For a most consistent appearance, the font family \textit{Computer Modern Unicode} available at \url{http://sourceforge.net/projects/cm-unicode/} should be used. It extends the default Latex font which has a very limited coverage of unicode letters. Any other installed system font will work as well, although one has to find a matching package for the math fonts then.
 
 \begin{figure}[h]
 \subfigure[Computer Modern Unicode font]{\input{figure.pgf}}

@@ -112,11 +112,14 @@ def _font_properties_str(prop):
     
     styles = {"normal": r"", "italic": r"\itshape", "oblique": r"\slshape"}
     commands.append(styles[prop.get_style()])
-
-    families = {"serif": r"\rmfamily", "sans-serif": r"\sffamily", "monospace": r"\ttfamily"}
+    
+    # TODO: does not handle the selection of a specific font yet
+    families = {"serif": r"\rmfamily", "sans": r"\sffamily",
+                "sans-serif": r"\sffamily", "monospace": r"\ttfamily"}
     commands.append(families.get(prop.get_family()[0], ""))
     
-    boldstyles = ["semibold", "demibold", "demi", "bold", "heavy", "extra bold", "black"]
+    boldstyles = ["semibold", "demibold", "demi", "bold", "heavy",
+                  "extra bold", "black"]
     if prop.get_weight() in boldstyles: commands.append(r"\bfseries")
 
     commands.append(r"\selectfont")

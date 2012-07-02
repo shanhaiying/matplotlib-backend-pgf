@@ -49,12 +49,12 @@ p.tight_layout(0.0)
 p.legend()
 
 if use_pgf:
-    print "saving pgf figures in demo/"
-    p.savefig("demo/figure.pgf")
-    p.savefig("demo/figure-pgf.pdf")    
+    print "saving pgf figures"
+    p.savefig("figure.pgf")
+    p.savefig("figure-pgf.pdf")    
 elif matplotlib.rcParams["text.usetex"]:
-    print "saving pdf-usetex figure in demo/"
-    p.savefig("demo/figure-pdf-usetex.pdf")
+    print "saving pdf-usetex figure"
+    p.savefig("figure-pdf-usetex.pdf")
 else:
-    print "saving pdf figure in demo/"
-    p.savefig("demo/figure-pdf.pdf")
+    print "saving pdf figure"
+    p.savefig("figure-pdf.pdf")
