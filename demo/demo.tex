@@ -11,31 +11,31 @@
 
 \begin{document}
 
-\subsection*{PDF/Latex Backend Problems}
+\subsection*{PDF/Latex Output Problems}
+When creating figures to be included in Latex documents, saving them as PDF is probably method of choice. The appearance of text elements within the graphs however differs from the Latex typesetting. Naturally, figures created with the \textit{text.usetex} option look more consistent as they are rendered with Latex as well. But Pdflatex, which is used by matplotlib, has no real unicode support and limits the possibilities of using unicode in figures.
 
-When creating figures to be included in Latex documents the PDF backend is probably the first choice. The appearance of text elements within the graphs however differs from the Latex typesetting. Naturally, the figures created with the \textit{text.usetex} option look more consistent as they are rendered with Latex as well. But pdflatex, which is used by the backend, has no real unicode support which limits the possibilities of using special characters in figures.
-
-The following figure contains greek unicode letters, math text and normal text. It is produced using the PDF backend:
+The following figure contains some letters from different languages, math text and normal text. It was saved using the default PDF output option:
 
 \begin{figure}[h]
-\subfigure[Matplotlib PDF backend. Serif font not consistent with the Latex default font. Math-text not consistent with normal text. Some letters are not aligned correctly.]{\includegraphics{figure-pdf.pdf}}
+\subfigure[Matplotlib PDF output. The serif font is not consistent with the default font from Latex. Math-text not consistent with normal text. Some letters are not aligned correctly. Tight-layout is not working correctly (too much space or clipping effect).]{\includegraphics{figure-pdf.pdf}}
 \hspace{1mm}
-\subfigure[Matplotlib with Latex rendering. Consistent look in Latex documents, better looking math-text, but no real unicode support. The conversion process to PDF increases the filesize a lot. Greek letters are missing and the micro sign is replaced by an italic mu-symbol from the math font. Baseline offset of the second label is incorrect.]{\includegraphics{figure-pdf-usetex.pdf}}
+\subfigure[Matplotlib with Latex rendering. Figure texts, math formulas and this document are using the same font and look consistent, but the conversion process to PDF increases the filesize a lot. Some unicode letters are missing completely and the micro sign was replaced by an italic mu-symbol from the math font. Baseline offset of the second label is incorrect.]{\includegraphics{figure-pdf-usetex.pdf}}
 \caption{PDF figures created with matplotlib v1.1.1.}
 \end{figure}
 
 
 \newpage
 \subsection*{Pgf Backend with Xelatex}
+For real unicode support the use of Xelatex or Lualatex is mandatory. In order to use these new Latex implementations in Matplotlib, a new backend is required as the \textit{pstricks} methods for drawing the figures are not available anymore. The \textit{pgf} package offers an alternative that works for Pdflatex, Xelatex and Lualatex alike. Figures are drawn using the \textit{pgfpicture} environment and can be included in Latex documents as raw commands (\textbackslash input) or can be pre-compiled to PDF for inclusion (\textbackslash
+ includegraphics). Still, Xelatex needs a font with extended glyph coverage for the unicode characters. A unicode variant of the \textit{Computer Modern} fonts used by Latex is available at \url{http://sourceforge.net/projects/cm-unicode/} and should be used if the figures are supposed to blend in. Of course, any other installed system font will work as well but one has to search for a math font package that harmonizes with the selected text font.
 
-For real unicode support the use of Xelatex or Lualatex is mandatory. In order to use these new Latex implementations in Matplotlib, a new backend is required as the \textit{pstricks} methods for drawing the figures are not available anymore. The \textit{pgf} package offers an alternative that works for Pdflatex, Xelatex and Lualatex alike. Figures are drawn in \textit{pgfpicture} environments and can be included in Latex documents directly (\textbackslash input) or be pre-compiled to PDF for inclusion (\textbackslash
- includegraphics). For a most consistent appearance, the font family \textit{Computer Modern Unicode} available at \url{http://sourceforge.net/projects/cm-unicode/} should be used. It extends the default Latex font which has a very limited coverage of unicode letters. Any other installed system font will work as well, although one has to find a matching package for the math fonts then.
 
 \begin{figure}[h]
 \subfigure[Computer Modern Unicode font]{\input{figure.pgf}}
 \hspace{1mm}
-\subfigure[{\setmainfont{Linux Biolinum O}Main font switched to Biolinum}]{\setmainfont{Linux Biolinum O}\input{figure.pgf}}
-\caption{Pgf figure commands included in a Xelatex compiled document. The fonts were changed within the document without recreating the figure in matplotlib.}
+{\setmainfont{Linux Biolinum O}
+\subfigure[Main font switched to Biolinum]{\input{figure.pgf}} }
+\caption{Figure saved as textfile with pgf commands. The file has been included two times. For the second inclusion the document's main font is changed without recreating the figure in matplotlib.}
 \end{figure}
 
 \end{document}
