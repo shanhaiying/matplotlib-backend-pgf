@@ -25,6 +25,8 @@ from matplotlib.ft2font import FT2Font
 # debug switch
 debug = bool(rcParams.get("pgf.debug", False))
 
+# create a list of system fonts, all of these should work with xelatex
+system_fonts = [FT2Font(f).family_name for f in font_manager.findSystemFonts()]
 # font configuration
 rcfonts = rcParams.get("pgf.rcfonts", True)
 latex_fontspec = []
@@ -32,9 +34,6 @@ if not rcfonts:
     # use standard LaTeX fonts and use default serif font
     rcParams["font.family"] = "serif"
 else:
-    # build a list of system font families
-    system_fonts = [FT2Font(f).family_name for f in font_manager.findSystemFonts()]
-
     # try to find fonts from rc parameters
     families = ["serif", "sans-serif", "monospace"]
     fontspecs = [r"\setmainfont{%s}", r"\setsansfont{%s}", r"\setmonofont{%s}"]
@@ -43,8 +42,7 @@ else:
         if matches:
             latex_fontspec.append(fontspec % matches[0])
         else:
-            warnings.warn("No fonts found in font.%s, using LaTeX default.\n" % family)
-    
+            warnings.warn("No fonts found in font.%s, using LaTeX default.\n" % family)    
     if debug:
         print "font specification:", latex_fontspec
 latex_fontspec = "\n".join(latex_fontspec)
@@ -106,24 +104,28 @@ def writeln(fh, line):
 def _font_properties_str(prop):
     # translate font properties to latex commands, return as string
     commands = []
-    
-    size = prop.get_size_in_points()
-    commands.append(r"\fontsize{%f}{%f}" % (size, size*1.2))
-    
-    styles = {"normal": r"", "italic": r"\itshape", "oblique": r"\slshape"}
-    commands.append(styles[prop.get_style()])
-    
-    # TODO: does not handle the selection of a specific font yet
+
     families = {"serif": r"\rmfamily", "sans": r"\sffamily",
                 "sans-serif": r"\sffamily", "monospace": r"\ttfamily"}
-    commands.append(families.get(prop.get_family()[0], ""))
+    family = prop.get_family()[0]
+    if family in families:
+        commands.append(families[family])
+    elif family in system_fonts:
+        commands.append(r"\setmainfont{%s}\rmfamily" % family)
+    else:
+        pass # print warning?
+
+    size = prop.get_size_in_points()
+    commands.append(r"\fontsize{%f}{%f}" % (size, size*1.2))
+
+    styles = {"normal": r"", "italic": r"\itshape", "oblique": r"\slshape"}
+    commands.append(styles[prop.get_style()])
     
     boldstyles = ["semibold", "demibold", "demi", "bold", "heavy",
                   "extra bold", "black"]
     if prop.get_weight() in boldstyles: commands.append(r"\bfseries")
 
     commands.append(r"\selectfont")
-    
     return "".join(commands)
 
 
@@ -601,7 +603,7 @@ class FigureCanvasPgf(FigureCanvasBase):
             tick.label2.set_visible(tick.label2On)
         # TODO: strange, first legend label is always "None", workaround
         for legend in self.figure.findobj(mpl.legend.Legend):
-            labels = legend.findobj(matplotlib.text.Text)
+            labels = legend.findobj(mpl.text.Text)
             labels[0].set_visible(False)
         # TODO: strange, legend child labels are duplicated,
         # find a list of unique text objects as workaround
