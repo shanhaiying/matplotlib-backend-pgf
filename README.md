@@ -11,4 +11,4 @@ A backend for matplotlib drawing pgf pictures that can processed with XeLaTex/Lu
 
 Some notes:
 
-* It is recommended to install the [unicode variant of Computer Modern](http://sourceforge.net/projects/cm-unicode/) and to choose `CMU Serif`, `CMU Sans Serif`, etc. in the rc parameters (`demo/create_demo_figures.py` for example). This provides the most consistent appearance for LaTeX documents.
+* It is recommended to install the [unicode variant of Computer Modern](http://sourceforge.net/projects/cm-unicode/) and to choose `CMU Serif`, `CMU Sans Serif`, etc. in the rc parameters. The [demo script](https://github.com/pwuertz/matplotlib-backend-pgf/blob/master/demo/create_demo_figures.py) uses these fonts for example. This provides the most consistent appearance for LaTeX documents.
