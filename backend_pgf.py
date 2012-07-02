@@ -9,7 +9,7 @@ import subprocess
 import warnings
 warnings.formatwarning = lambda *args: str(args[0])
 
-import matplotlib
+import matplotlib as mpl
 from matplotlib.backend_bases import RendererBase, GraphicsContextBase,\
      FigureManagerBase, FigureCanvasBase
 from matplotlib.figure import Figure
@@ -67,27 +67,35 @@ mpl_in_to_pt = 1./mpl_pt_to_in
 ###############################################################################
 # helper functions
 
-mathdefault_search = re.compile(r"\\mathdefault")
-inlinemath_search = re.compile(r"(?<!\\)\$(.*?)(?<!\\)\$")
+NO_ESCAPE = r"(?<!\\)(?:\\\\)*"
+re_mathsep = re.compile(NO_ESCAPE + r"\$")
+re_escapetext = re.compile(NO_ESCAPE + "([_^$%])")
+repl_escapetext = lambda m: "\\" + m.group(1)
+re_mathdefault = re.compile(NO_ESCAPE + r"(\\mathdefault)")
+repl_mathdefault = lambda m: m.group(0)[:-len(m.group(1))]
 
 def common_texification(text):
     """
     Do some necessary and/or useful substitutions for texts to be included in
     LaTeX documents.
     """
+
+    # Sometimes, matplotlib adds the unknown command \mathdefault.
+    # Not using \mathnormal instead since this looks odd for the latex cm font.
+    text = re_mathdefault.sub(repl_mathdefault, text)
+
+    # split text into normaltext and inline math parts
+    parts = re_mathsep.split(text)
+    for i, s in enumerate(parts):
+        if not i%2:
+            # textmode replacements
+            s = re_escapetext.sub(repl_escapetext, s)
+        else:
+            # mathmode replacements
+            s = r"\(\displaystyle %s\)" % s
+        parts[i] = s
     
-    # Sometimes, matplotlib uses the unknown command \mathdefault.
-    # Not using \mathnormal instead since this looks odd for the default font.
-    text = mathdefault_search.sub(r"", text)
-    
-    # Make inline math displaystyled.
-    math_replace = lambda match: r"\(\displaystyle %s\)" % match.group(1)
-    text = inlinemath_search.sub(math_replace, text)
-    
-    # Escape percent sign
-    text = re.sub(r"(?<!\\)%", r"\%", text)
-    
-    return text
+    return "".join(parts)
 
 def writeln(fh, line):
     # every line of a file included with \input must be terminated with %
@@ -575,6 +583,8 @@ class FigureCanvasPgf(FigureCanvasBase):
             os.chdir(cwd)
 
     def _render_texts_pgf(self, fh):
+        # TODO: currently unused code path
+        
         # alignment anchors
         valign = {"top": "top", "bottom": "bottom", "baseline": "base", "center": ""}
         halign = {"left": "left", "right": "right", "center": ""}
@@ -583,11 +593,11 @@ class FigureCanvasPgf(FigureCanvasBase):
         rhalign = {"left": "top", "right": "bottom", "center": ""}
         
         # TODO: matplotlib does not hide unused tick labels yet, workaround
-        for tick in self.figure.findobj(matplotlib.axis.Tick):
+        for tick in self.figure.findobj(mpl.axis.Tick):
             tick.label1.set_visible(tick.label1On)
             tick.label2.set_visible(tick.label2On)
         # TODO: strange, first legend label is always "None", workaround
-        for legend in self.figure.findobj(matplotlib.legend.Legend):
+        for legend in self.figure.findobj(mpl.legend.Legend):
             labels = legend.findobj(matplotlib.text.Text)
             labels[0].set_visible(False)
         # TODO: strange, legend child labels are duplicated,
