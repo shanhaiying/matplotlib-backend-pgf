@@ -34,5 +34,4 @@ plt.ylabel(r"Sans-serif math $\frac{1}{N} \sum_i x_i$")
 plt.legend().legendPatch.set_facecolor([1., 1., 1., .8])
 
 plt.tight_layout(pad=.5)
-plt.savefig("test_fontspec.pgf")
 plt.savefig("test_fontspec.pdf")

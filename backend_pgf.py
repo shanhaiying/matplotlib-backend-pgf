@@ -427,6 +427,9 @@ class RendererPgf(RendererBase):
         f = 1./self.dpi # from display coords to inch
         writeln(self.fh, r"\pgftext[at=\pgfqpoint{%fin}{%fin},left,bottom]{\pgfimage[interpolate=true,width=%fin,height=%fin]{%s}}" % (x*f, y*f, w*f, h*f, fname_img))
         writeln(self.fh, r"\end{pgfscope}")
+    
+    def draw_tex(self, gc, x, y, s, prop, angle, ismath="TeX!"):
+        self.draw_text(gc, x, y, s, prop, angle, ismath)
 
     def draw_text(self, gc, x, y, s, prop, angle, ismath=False):
         if not self.draw_texts: return
