@@ -24,7 +24,7 @@ Then, right at the beginning of your plotting script, activate the backend.
     import matplotlib as mpl
     mpl.use("module://backend_pgf")
 
-It is recommended to use the [unicode variant of Computer Modern](http://sourceforge.net/projects/cm-unicode/) as font family since it harmonizes best within LaTeX documents and provides extended glyph coverage. You can also use the standard fonts of your installed LaTeX system by setting empty lists for "font.serif", "font.sans-serif" and "font.monospace". See the examples how font selection is handles by the backend.
+XeLaTeX, and thus this backend as well, can use any font that is known by the operating system. However, LaTeX documents use the Computer Modern font family. For creating figures with the same font family it is recommended to use the [unicode variant of Computer Modern](http://sourceforge.net/projects/cm-unicode/) since it provides extended glyph coverage. You can also use the standard fonts of your installed LaTeX system by setting empty lists for "font.serif", "font.sans-serif" and "font.monospace". See the examples how font selection is handled by the backend.
 
     rc_cmufonts.append({
         "font.family": "serif"
