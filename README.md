@@ -11,6 +11,10 @@ A backend for matplotlib that creates pgf pictures which can be processed with X
 
 ![Example Image](https://github.com/pwuertz/matplotlib-backend-pgf/raw/master/demo/figure-pgf.png)
 
+### Requirements
+
+The only requirement is an installed TeX distribution that includes `xelatex` and the `pgf` package (both found in [TeX Live](http://www.tug.org/texlive/) for example). The `xelatex` command must be in the system's path.
+
 ### How to use it
 
 Simply place the file `backend_pgf.py` in a directory that is in python's search path or right next to your plotting script.
