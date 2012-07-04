@@ -1,3 +1,9 @@
+## latex related
+*.out
+*.aux
+*.log
+
+## python related
 *.py[co]
 
 # Packages
