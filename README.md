@@ -30,7 +30,7 @@ XeLaTeX, and thus this backend as well, can use any font that is known by the op
         "font.family": "serif"
         "font.serif": ["CMU Serif"],
         "font.sans-serif": ["CMU Sans Serif"],
-        "font.monospace": ["CMU Concrete"],
+        "font.monospace": [], # fallback to the default LaTeX monospace font
         })
     mpl.rcParams.update(rc_cmufonts)
 
