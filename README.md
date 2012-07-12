@@ -3,6 +3,8 @@ matplotlib-backend-pgf
 
 A backend for matplotlib that creates pgf pictures which can be processed with XeLaTex/LuaLaTeX. This enables full unicode support and a consistent typesetting of the text elements within LaTeX documents.
 
+Please let me know if you have difficulties in using this backend or if the output of your figures doesn't look as expected.
+
 ### Examples
 
 * See the [demo document](https://github.com/pwuertz/matplotlib-backend-pgf/raw/master/demo/demo.pdf) for a comparison with the PDF+usetex backend.
