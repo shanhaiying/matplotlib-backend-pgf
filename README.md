@@ -26,19 +26,31 @@ Then, right at the beginning of your plotting script, activate the backend.
     import matplotlib as mpl
     mpl.use("module://backend_pgf")
 
-XeLaTeX, and thus this backend as well, can use any font that is known by the operating system. However, LaTeX documents use the Computer Modern font family. For creating figures with the same font family it is recommended to use the [unicode variant of Computer Modern](http://sourceforge.net/projects/cm-unicode/) since it provides extended glyph coverage. You can also use the standard fonts of your installed LaTeX system by setting empty lists for "font.serif", "font.sans-serif" and "font.monospace". The examples show how font selection is handled by the backend.
+XeLaTeX, and thus this backend as well, can use any font that is known by the operating system. However, LaTeX documents use the Computer Modern font family. For creating figures with the same font family it is recommended to use the [unicode variant of Computer Modern](http://sourceforge.net/projects/cm-unicode/) since it provides extended glyph coverage. You can also use the standard fonts of your installed LaTeX system by setting empty lists for "font.serif", "font.sans-serif" and "font.monospace". The examples show how font selection is handled by the backend:
 
-    rc_cmufonts.append({
+    rc_cmufonts = {
         "font.family": "serif"
         "font.serif": ["CMU Serif"],
         "font.sans-serif": ["CMU Sans Serif"],
         "font.monospace": [], # fallback to the default LaTeX monospace font
-        })
+        }
     mpl.rcParams.update(rc_cmufonts)
 
-With the backend activated you can save figures as PDF file, produced by XeLaTeX, or save the drawing commands to a textfile for inclusion in LaTeX documents.
+With the backend activated you can save figures as PDF file, produced by XeLaTeX, or save the drawing commands to a textfile for inclusion in LaTeX documents:
 
     import pylab as p
     ...
     p.savefig("figure.pgf")
     p.savefig("figure.pdf")
+
+The LaTeX document for creating the figures can be fully customized by adding your own commands to the preamble. Use the `pgf.preamble` rc parameter if you want to configure the math fonts or for loading additional packages. Also, if you want to do the font configuration yourself instead of using the fonts specified in the rc parameters, make sure to disable `pgf.rcfonts`:
+
+    rc_custom_preamble = {
+        "pgf.rcfonts": False,   # do not setup fonts from the mpl rc params
+        "pgf.preamble": r"""
+    \usepackage{siunitx}
+    \usepackage{unicode-math}
+    \setmathfont{XITS Math}
+    \setmainfont{Gentium}
+    """}
+    mpl.rcParams.update(rc_custom_preamble)
