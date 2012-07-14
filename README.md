@@ -48,9 +48,9 @@ The LaTeX document for creating the figures can be fully customized by adding yo
     rc_custom_preamble = {
         "pgf.rcfonts": False,   # do not setup fonts from the mpl rc params
         "pgf.preamble": r"""
-    \usepackage{siunitx}
-    \usepackage{unicode-math}
+    \usepackage{siunitx}        % use additional packages
+    \usepackage{unicode-math}   % configure math fonts
     \setmathfont{XITS Math}
-    \setmainfont{Gentium}
+    \setmainfont{Gentium}       % manually setting the main font
     """}
     mpl.rcParams.update(rc_custom_preamble)
