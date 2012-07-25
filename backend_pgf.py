@@ -1,5 +1,6 @@
 from __future__ import division
 
+import math
 import os
 import re
 import shutil
@@ -313,77 +314,51 @@ class RendererPgf(RendererBase):
             writeln(self.fh, r"\end{pgfscope}")
 
         writeln(self.fh, r"\end{pgfscope}")
-        
-    def _NOT_USING_draw_path_collection(self, gc, master_transform, paths, all_transforms,
-                             offsets, offsetTrans, facecolors, edgecolors,
-                             linewidths, linestyles, antialiaseds, urls):
-        # - no significant reduction in file size
-        # - tends to be slower than drawing the paths individually
-        # -> not using this function
-        
-        # convert from display units to in
-        f = 1./self.dpi
-        
-        # unfortunately, usepath must be part of a path definition
-        # so we need to figure out which combinations of fills and strokes are
-        # required for each path id and make a definition for each combination 
-        path_ids = range(len(paths))
-        action_variants = [set() for i in path_ids]
-        for xo, yo, path_id, gc0, rgbFace in self._iter_collection(
-            gc, path_ids, offsets, offsetTrans, facecolors, edgecolors,
-            linewidths, linestyles, antialiaseds, urls):
-            actions = []
-            if rgbFace is not None: actions.append("fill")
-            if gc0.get_linewidth() != 0: actions.append("stroke")
-            action_variants[path_id].add(",".join(actions))
-        
-        # build definitions
-        def_names = []
-        for i, (path, transform) in enumerate(self._iter_collection_raw_paths(
-                                    master_transform, paths, all_transforms)):
-            bl, tr = path.get_extents(transform).get_points()
-            # make a definition for each required fill/stroke use
-
-            def_name = "path,%d" % i
-            
-            def_names.append(def_name)
-            args = def_name, bl[0]*f, bl[1]*f, tr[0]*f, tr[1]*f
-            writeln(self.fh, r"\pgfsys@defobject{%s}{\pgfqpoint{%fin}{%fin}}{\pgfqpoint{%fin}{%fin}}{" % args)
-            self._print_pgf_path(path, transform)
-            writeln(self.fh, r"\pgfusepath{stroke}")
-            writeln(self.fh, r"}")
-            
-            for actions in action_variants[i]:
-                args = def_name, actions, bl[0]*f, bl[1]*f, tr[0]*f, tr[1]*f
-                writeln(self.fh, r"\pgfsys@defobject{%s,%s}{\pgfqpoint{%fin}{%fin}}{\pgfqpoint{%fin}{%fin}}{" % args)
-                self._print_pgf_path(path, transform)
-                writeln(self.fh, r"\pgfusepath{%s}" % actions)
-                writeln(self.fh, r"}")
-        
-        # draw paths multiple times
-        for xo, yo, def_name, gc0, rgbFace in self._iter_collection(
-            gc, def_names, offsets, offsetTrans, facecolors, edgecolors,
-            linewidths, linestyles, antialiaseds, urls):
-            actions = []
-            if rgbFace is not None: actions.append("fill")
-            if gc0.get_linewidth() != 0: actions.append("stroke")
-            actions = ",".join(actions)
-            
-            writeln(self.fh, r"\begin{pgfscope}")
-            writeln(self.fh, r"\pgfsys@transformshift{%fin}{%fin}" % (xo*f,yo*f))
-            self._print_pgf_clip(gc0)
-            self._print_pgf_path_styles(gc0, rgbFace)
-            writeln(self.fh, r"\pgfsys@useobject{%s,%s}{}" % (def_name, actions))
-            writeln(self.fh, r"\end{pgfscope}")
     
     def draw_path(self, gc, path, transform, rgbFace=None):
         writeln(self.fh, r"\begin{pgfscope}")
+        # draw the path
         self._print_pgf_clip(gc)
         self._print_pgf_path_styles(gc, rgbFace)
         self._print_pgf_path(path, transform)
         self._pgf_path_draw(stroke=gc.get_linewidth() != 0.0,
                             fill=rgbFace is not None)
         writeln(self.fh, r"\end{pgfscope}")
+        
+        
+        # if present, draw pattern on top
+        if gc.get_hatch():
+            writeln(self.fh, r"\begin{pgfscope}")
+            
+            # combine clip and path for clipping
+            self._print_pgf_clip(gc)
+            self._print_pgf_path(path, transform)
+            writeln(self.fh, r"\pgfusepath{clip}")
+
+            # build pattern definition
+            writeln(self.fh, r"\pgfsys@defobject{currentpattern}{\pgfqpoint{0in}{0in}}{\pgfqpoint{1in}{1in}}{")
+            writeln(self.fh, r"\begin{pgfscope}")
+            writeln(self.fh, r"\pgfpathrectangle{\pgfqpoint{0in}{0in}}{\pgfqpoint{1in}{1in}}")
+            writeln(self.fh, r"\pgfusepath{clip}")
+            scale = mpl.transforms.Affine2D().scale(self.dpi)
+            self._print_pgf_path(gc.get_hatch_path(), scale)
+            self._pgf_path_draw(stroke=True)
+            writeln(self.fh, r"\end{pgfscope}")
+            writeln(self.fh, r"}")
+            # repeat pattern, filling the bounding rect of the path
+            f = 1./self.dpi
+            (xmin, ymin), (xmax, ymax) = path.get_extents(transform).get_points()
+            xmin, ymin, xmax, ymax = f*xmin, f*ymin, f*xmax, f*ymax
+            repx, repy = int(math.ceil(xmax-xmin)), int(math.ceil(ymax-ymin))
+            writeln(self.fh, r"\pgfsys@transformshift{%fin}{%fin}" % (xmin, ymin))
+            for iy in range(repy):
+                for ix in range(repx):
+                    writeln(self.fh, r"\pgfsys@useobject{currentpattern}{}")
+                    writeln(self.fh, r"\pgfsys@transformshift{1in}{0in}")
+                writeln(self.fh, r"\pgfsys@transformshift{-%din}{0in}" % repx)
+                writeln(self.fh, r"\pgfsys@transformshift{0in}{1in}")
+            
+            writeln(self.fh, r"\end{pgfscope}")
     
     def _print_pgf_clip(self, gc):
         f = 1./self.dpi
