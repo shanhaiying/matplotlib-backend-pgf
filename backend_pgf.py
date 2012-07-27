@@ -32,7 +32,12 @@ texsystem = rcParams.get("pgf.texsystem", "xelatex")
 texsystem = texsystem if texsystem in texsystem_options else "xelatex"
 
 # create a list of system fonts, all of these should work with xe/lua-latex
-system_fonts = [FT2Font(f).family_name for f in font_manager.findSystemFonts()]
+system_fonts = []
+for f in font_manager.findSystemFonts():
+    try:
+        system_fonts.append(FT2Font(f).family_name)
+    except RuntimeError:
+        pass
 # font configuration
 rcfonts = rcParams.get("pgf.rcfonts", True)
 latex_fontspec = []
@@ -48,7 +53,7 @@ else:
         if matches:
             latex_fontspec.append(fontspec % matches[0])
         else:
-            warnings.warn("No fonts found in font.%s, using LaTeX default.\n" % family)    
+            warnings.warn("No fonts found in font.%s, using LaTeX default.\n" % family)
     if debug:
         print "font specification:", latex_fontspec
 latex_fontspec = "\n".join(latex_fontspec)
