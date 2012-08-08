@@ -27,24 +27,27 @@ from matplotlib.ft2font import FT2Font
 debug = bool(rcParams.get("pgf.debug", False))
 
 # which TeX system is to be used
-texsystem_options = ["xelatex", "lualatex"]
+texsystem_options = ["xelatex", "lualatex", "pdflatex"]
 texsystem = rcParams.get("pgf.texsystem", "xelatex")
 texsystem = texsystem if texsystem in texsystem_options else "xelatex"
 
-# create a list of system fonts, all of these should work with xe/lua-latex
+# font configuration based on texsystem
 system_fonts = []
-for f in font_manager.findSystemFonts():
-    try:
-        system_fonts.append(FT2Font(f).family_name)
-    except RuntimeError:
-        pass
-# font configuration
-rcfonts = rcParams.get("pgf.rcfonts", True)
 latex_fontspec = []
-if not rcfonts:
-    # use standard LaTeX fonts and use default serif font
-    rcParams["font.family"] = "serif"
+if texsystem is not "pdflatex":
+    rcfonts = rcParams.get("pgf.rcfonts", True)
+    latex_fontspec.append(r"\usepackage{fontspec}")
+    # create a list of system fonts, all of these should work with xe/lua-latex
+    for f in font_manager.findSystemFonts():
+        try:
+            system_fonts.append(FT2Font(f).family_name)
+        except RuntimeError:
+            pass
 else:
+    rcfonts = False
+
+# font configuration via matplotlib rc
+if rcfonts:
     # try to find fonts from rc parameters
     families = ["serif", "sans-serif", "monospace"]
     fontspecs = [r"\setmainfont{%s}", r"\setsansfont{%s}", r"\setmonofont{%s}"]
@@ -56,6 +59,7 @@ else:
             warnings.warn("No fonts found in font.%s, using LaTeX default.\n" % family)
     if debug:
         print "font specification:", latex_fontspec
+
 latex_fontspec = "\n".join(latex_fontspec)
 
 # LaTeX preamble
@@ -158,7 +162,6 @@ class LatexManager:
         # TODO: is this sufficient?
         latex_header = u"""\\documentclass{minimal}
 %s
-\\usepackage{fontspec}
 %s
 \\begin{document}
 text $math \mu$ %% force latex to load fonts now
@@ -614,7 +617,6 @@ class FigureCanvasPgf(FigureCanvasBase):
 \documentclass[12pt]{minimal}
 \usepackage[paperwidth=%fin, paperheight=%fin, margin=0in]{geometry}
 %s
-\usepackage{fontspec}
 %s
 \usepackage{pgf}
 

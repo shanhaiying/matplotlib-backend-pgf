@@ -9,6 +9,7 @@ mpl.use('module://backend_pgf')
 
 # use latex default fonts only
 font_spec = {"pgf.rcfonts": False,
+             "font.family": "serif",
              # fonts specified in matplotlib are ignored
              "font.serif": ["dont care"],
              "font.sans-serif": ["me neither"],
@@ -26,7 +27,7 @@ Y, X = np.ogrid[-1.:1.:61j, -1.:1.:61j]
 plt.figure(figsize=[5, 2.7])
 plt.subplot(1,2,1)
 plt.imshow(X**2 + Y**2, origin="lower", aspect="auto")
-plt.xlabel("only using \LaTeX \ldots")
+plt.xlabel("only using \LaTeX \ldots", family="sans-serif")
 
 plt.subplot(1,2,2)
 plt.plot(x, np.sin(np.pi*x), label="$f(x)=\sin(\pi x)$")
