@@ -203,8 +203,11 @@ text $math \mu$ %% force latex to load fonts now
         self.str_cache = {}
     
     def __del__(self):
-        self.latex.terminate()
-        self.latex.wait()
+        try:
+            self.latex.terminate()
+            self.latex.wait()
+        except:
+            pass
         try:
             os.remove("texput.log")
             os.remove("texput.aux")
