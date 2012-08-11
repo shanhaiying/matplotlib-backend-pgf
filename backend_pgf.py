@@ -2,6 +2,7 @@ from __future__ import division
 
 import math
 import os
+import sys
 import re
 import shutil
 import tempfile
@@ -555,7 +556,8 @@ def new_figure_manager(num, *args, **kwargs):
 
 class FigureCanvasPgf(FigureCanvasBase):
     filetypes = {"pgf": "LaTeX PGF picture",
-                 "pdf": "LaTeX compiled PGF picture"}
+                 "pdf": "LaTeX compiled PGF picture",
+                 "png": "Portable Network Graphics",}
 
     def __init__(self, *args):
         FigureCanvasBase.__init__(self, *args)
@@ -637,8 +639,39 @@ class FigureCanvasPgf(FigureCanvasBase):
                 raise RuntimeError("LaTeX was not able to process your file.\nLaTeX stdout saved to %s" % (target+".err"))
             shutil.copyfile("figure.pdf", target)
         finally:
-            shutil.rmtree(tmpdir)
             os.chdir(cwd)
+            shutil.rmtree(tmpdir)            
+
+    def print_png(self, filename, *args, **kwargs):
+        """
+        Use LaTeX to compile a pgf figure to pdf and convert it to png.
+        """
+        
+        if not mpl.checkdep_ghostscript():
+            raise RuntimeError("Ghostscript is required for saving to png.")
+        
+        # FIXME: make checkdep_ghostscript return the command
+        if sys.platform == 'win32':
+            gs = 'gswin32c'
+        else:
+            gs = 'gs'
+        gsargs = [gs, '-dQUIET', '-dSAFER', '-dBATCH', '-dNOPAUSE', '-dNOPROMPT',
+                  '-sDEVICE=png16m', '-dUseCIEColor', '-dTextAlphaBits=4',
+                  '-dGraphicsAlphaBits=4', '-dDOINTERPOLATE', '-sOutputFile=figure.png',
+                  '-r%d' % self.figure.dpi, 'figure.pdf']
+        
+        target = os.path.abspath(filename)        
+        try:            
+            tmpdir = tempfile.mkdtemp()
+            cwd = os.getcwd()
+            os.chdir(tmpdir)
+            
+            self.print_pdf("figure.pdf")
+            subprocess.check_call(gsargs)
+            shutil.copyfile("figure.png", target)
+        finally:
+            os.chdir(cwd)
+            shutil.rmtree(tmpdir)
 
     def _render_texts_pgf(self, fh):
         # TODO: currently unused code path
