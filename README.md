@@ -36,12 +36,13 @@ XeLaTeX, and thus this backend as well, can use any font that is known by the op
         }
     mpl.rcParams.update(rc_cmufonts)
 
-With the backend activated you can save figures as PDF file, produced by XeLaTeX, or save the drawing commands to a textfile for inclusion in LaTeX documents:
+With the backend activated you can save figures as PDF file, produced by XeLaTeX, or save the drawing commands to a textfile for inclusion in LaTeX documents. If ghostscript is installed, the figure can be converted to png as well.
 
     import pylab as p
     ...
     p.savefig("figure.pgf")
     p.savefig("figure.pdf")
+    p.savefig("figure.png")
 
 The LaTeX document for creating the figures can be fully customized by adding your own commands to the preamble. Use the `pgf.preamble` rc parameter if you want to configure the math fonts or for loading additional packages. Also, if you want to do the font configuration yourself instead of using the fonts specified in the rc parameters, make sure to disable `pgf.rcfonts`:
 
