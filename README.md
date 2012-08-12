@@ -36,7 +36,7 @@ XeLaTeX, and thus this backend as well, can use any font that is known by the op
         }
     mpl.rcParams.update(rc_cmufonts)
 
-With the backend activated you can save figures as PDF file, produced by XeLaTeX, or save the drawing commands to a textfile for inclusion in LaTeX documents. If ghostscript is installed, the figure can be converted to png as well.
+With the backend activated you can save figures as PDF file, produced by XeLaTeX, or save the drawing commands to a textfile for inclusion in LaTeX documents. If pdftocairo or ghostscript is installed, the figure can be converted to png as well.
 
     import pylab as p
     ...
