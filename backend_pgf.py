@@ -144,6 +144,44 @@ def _font_properties_str(prop):
     commands.append(r"\selectfont")
     return "".join(commands)
 
+def make_pdf_to_png_converter():
+    """
+    Returns a function that converts a pdf file to a png file.
+    """
+    
+    tools_available = []
+    # check for pdftocairo
+    try:
+        subprocess.check_output(["pdftocairo", "-v"], stderr=subprocess.STDOUT)
+        tools_available.append("pdftocairo")
+    except:
+        pass
+    # check for ghostscript
+    try:
+        gs = "gs" if sys.platform is not "win32" else "gswin32c"
+        subprocess.check_output([gs, "-v"], stderr=subprocess.STDOUT)
+        tools_available.append("gs")
+    except:
+        pass
+    
+    # pick converter
+    if "pdftocairo" in tools_available:
+        def cairo_convert(pdffile, pngfile, dpi):
+            cmd = ["pdftocairo", "-singlefile", "-png",
+                   "-r %d" % dpi, pdffile, os.path.splitext(pngfile)[0]]
+            # for some reason this doesn't work without shell
+            subprocess.check_output(" ".join(cmd), shell=True, stderr=subprocess.STDOUT)
+        return cairo_convert
+    elif "gs" in tools_available:
+        def gs_convert(pdffile, pngfile, dpi):
+            cmd = [gs, '-dQUIET', '-dSAFER', '-dBATCH', '-dNOPAUSE', '-dNOPROMPT',
+                   '-sDEVICE=png16m', '-dUseCIEColor', '-dTextAlphaBits=4',
+                   '-dGraphicsAlphaBits=4', '-dDOINTERPOLATE', '-sOutputFile=%s' % pngfile,
+                   '-r%d' % dpi, pdffile]
+            subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        return gs_convert
+    else:
+        raise RuntimeError("No suitable pdf to png renderer found.")
 
 class LatexError(Exception):
     def __init__(self, message, latex_output = ""):
@@ -650,27 +688,15 @@ class FigureCanvasPgf(FigureCanvasBase):
         Use LaTeX to compile a pgf figure to pdf and convert it to png.
         """
         
-        if not mpl.checkdep_ghostscript():
-            raise RuntimeError("Ghostscript is required for saving to png.")
-        
-        # FIXME: make checkdep_ghostscript return the command
-        if sys.platform == 'win32':
-            gs = 'gswin32c'
-        else:
-            gs = 'gs'
-        gsargs = [gs, '-dQUIET', '-dSAFER', '-dBATCH', '-dNOPAUSE', '-dNOPROMPT',
-                  '-sDEVICE=png16m', '-dUseCIEColor', '-dTextAlphaBits=4',
-                  '-dGraphicsAlphaBits=4', '-dDOINTERPOLATE', '-sOutputFile=figure.png',
-                  '-r%d' % self.figure.dpi, 'figure.pdf']
-        
+        converter = make_pdf_to_png_converter()
+
         target = os.path.abspath(filename)        
         try:            
             tmpdir = tempfile.mkdtemp()
             cwd = os.getcwd()
             os.chdir(tmpdir)
-            
             self.print_pdf("figure.pdf")
-            subprocess.check_call(gsargs)
+            converter("figure.pdf", "figure.png", dpi=self.figure.dpi)
             shutil.copyfile("figure.png", target)
         finally:
             os.chdir(cwd)
