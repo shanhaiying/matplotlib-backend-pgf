@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+
+# lookup and the backend_pgf module in the parent folder
+import sys
+sys.path.append("..")
+
 # create a figure for different rc parameter sets
 rc_sets = []; fnames_sets = []
 
@@ -8,7 +13,7 @@ rc_sets.append({
     "font.serif": ["CMU Serif"], "font.sans-serif": ["CMU Sans Serif"],
     "font.monospace": ["CMU Concrete"],
     })
-fnames_sets.append(["figure-pgf.pdf", "figure.pgf"])
+fnames_sets.append(["figure-pgf.pdf", "figure.pgf", "figure-pgf.png"])
 
 # pdf backend with text.usetex
 rc_sets.append({
