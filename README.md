@@ -1,11 +1,12 @@
 
-
 The PGF backend is now part of matplotlib and will be included in the 1.2 release
 ======================
 
 This repository was the previous home of backend_pgf and won't be used for development or bugtracking anymore.
 
-### Examples
+### About backend_pgf
+
+Using the ``pgf`` backend, matplotlib can export figures as pgf drawing commands that can be processed with pdflatex, xelatex or lualatex. XeLaTeX and LuaLaTeX have full unicode support and can use any fonts installed in the operating system, making use of advanced typographic features of OpenType, AAT and Graphite. Pgf pictures created by ``plt.savefig('figure.pgf')`` can be embedded as raw commands in LaTeX documents. Figures can also be directly compiled and saved to PDF with ``plt.savefig('figure.pdf')``.
 
 * See the [demo document](https://github.com/pwuertz/matplotlib-backend-pgf/raw/master/demo/demo.pdf) for a comparison with the PDF+usetex backend.
 * The scipts in the [examples folder](https://github.com/pwuertz/matplotlib-backend-pgf/tree/master/examples) show how to use the backend and how font selection is handled.
