@@ -15,7 +15,8 @@ font_spec = {"font.family": "sans-serif",      # use sans-serif as default font
 mpl.rcParams.update(font_spec)
 
 # set a different math font via latex preamble
-mpl.rcParams.update({"pgf.preamble": r"\usepackage{cmbright}"})
+latex_preamble = {"pgf.preamble": [r"\usepackage{cmbright}"]}
+mpl.rcParams.update(latex_preamble)
 
 ##############################################################################
 

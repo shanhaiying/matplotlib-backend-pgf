@@ -1,15 +1,14 @@
-matplotlib-backend-pgf
+
+
+The PGF backend is now part of matplotlib and will be included in the 1.2 release
 ======================
 
-A backend for matplotlib that creates pgf pictures which can be processed with XeLaTex/LuaLaTeX. This enables full unicode support and a consistent typesetting of the text elements within LaTeX documents.
-
-Please let me know if you have difficulties in using this backend or if the output of your figures doesn't look as expected.
+This repository was the previous home of backend_pgf and won't be used for development or bugtracking anymore.
 
 ### Examples
 
 * See the [demo document](https://github.com/pwuertz/matplotlib-backend-pgf/raw/master/demo/demo.pdf) for a comparison with the PDF+usetex backend.
 * The scipts in the [examples folder](https://github.com/pwuertz/matplotlib-backend-pgf/tree/master/examples) show how to use the backend and how font selection is handled.
-* XeLaTeX compiled matplotlib examples - [Gallery](https://github.com/pwuertz/matplotlib-backend-pgf/wiki/Examples Gallery), [List](https://github.com/pwuertz/matplotlib-backend-pgf/wiki/Examples List)
 
 ![Example Image](https://github.com/pwuertz/matplotlib-backend-pgf/raw/master/demo/figure-pgf.png)
 
@@ -17,11 +16,13 @@ Please let me know if you have difficulties in using this backend or if the outp
 
 The only requirement is an installed TeX distribution that includes `xelatex` and the `pgf` package (both found in [TeX Live](http://www.tug.org/texlive/) for example). The `xelatex` command must be in the system's path.
 
+### Downloading the module (pre matplotlib 1.2)
+
+If you are using a version of matplotlib older than 1.2 you first have to download `backend_pgf.py` from the matplotlib repository. The `download_backend.py` script will do this for you. Simply place the file `backend_pgf.py` in a directory that is in python's search path or right next to your plotting script.
+
 ### How to use it
 
-Simply place the file `backend_pgf.py` in a directory that is in python's search path or right next to your plotting script.
-
-Then, right at the beginning of your plotting script, activate the backend.
+Right at the beginning of your plotting script, activate the backend.
 
     import matplotlib as mpl
     mpl.use("module://backend_pgf")
@@ -48,10 +49,11 @@ The LaTeX document for creating the figures can be fully customized by adding yo
 
     rc_custom_preamble = {
         "pgf.rcfonts": False,   # do not setup fonts from the mpl rc params
-        "pgf.preamble": r"""
-    \usepackage{siunitx}        % use additional packages
-    \usepackage{unicode-math}   % configure math fonts
-    \setmathfont{XITS Math}
-    \setmainfont{Gentium}       % manually setting the main font
-    """}
+        "pgf.preamble": [
+           r"\usepackage{siunitx}",      # use additional packages
+           r"\usepackage{unicode-math}", # configure math fonts
+           r"\setmathfont{XITS Math}",
+           r"\setmainfont{Gentium}",     # manually setting the main font
+           ]
+    }
     mpl.rcParams.update(rc_custom_preamble)

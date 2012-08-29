@@ -10,21 +10,25 @@ rc_sets = []; fnames_sets = []
 # pgf backend
 rc_sets.append({
     "backend": "module://backend_pgf",
-    "font.serif": ["CMU Serif"], "font.sans-serif": ["CMU Sans Serif"],
+    "font.serif": ["CMU Serif"],
+    "font.sans-serif": ["CMU Sans Serif"],
     "font.monospace": ["CMU Concrete"],
     })
 fnames_sets.append(["figure-pgf.pdf", "figure.pgf", "figure-pgf.png"])
 
 # pdf backend with text.usetex
 rc_sets.append({
-    "text.usetex": True, "text.latex.unicode": True,
-    "text.latex.preamble": ["\\usepackage{lmodern}", "\\usepackage[T1]{fontenc}"],
+    "text.usetex": True,
+    "text.latex.unicode": True,
+    "text.latex.preamble": [r"\usepackage{lmodern}",
+                            r"\usepackage[T1]{fontenc}"],
     })
 fnames_sets.append(["figure-pdf-usetex.pdf"])
 
 # plain pdf backend
 rc_sets.append({
     "text.usetex": False,
+    "font.serif": ["DejaVu Serif"],
     })
 fnames_sets.append(["figure-pdf.pdf"])
 
@@ -65,7 +69,7 @@ plt.plot(x, x**2, "r--", label=ur"Unicode, ияäüέψλ", lw=2)
 if mpl.rcParams["text.usetex"]:
     plt.plot(x, 1-x**2, "b-.", label=ur"Math, $\displaystyle\int_\Omega \mu \cdot x^2\,\mathrm{d}x$")
 else:
-    plt.plot(x, 1-x**2, "b-.", label=ur"Math, $\int_\Omega \mu \cdot x^2\,\mathrm{d}x$")    
+    plt.plot(x, 1-x**2, "b-.", label=ur"Math, $\int_\Omega \mu \cdot x^2\,\mathrm{d}x$")
 plt.plot(x, 0.2*x, "g>")
 plt.xlabel(ur"$x$-axis in units of $10^3\,$µm")
 plt.ylabel(ur"angle $\alpha$ in °")

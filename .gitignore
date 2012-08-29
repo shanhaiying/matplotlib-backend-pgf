@@ -1,3 +1,7 @@
+# the pgf module is now part of matplotlib
+# it is not tracked here anymore
+backend_pgf.py
+
 ## latex related
 *.out
 *.aux
