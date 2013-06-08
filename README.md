@@ -1,6 +1,6 @@
 
-The PGF backend is now part of matplotlib and will be included in the 1.2 release
-======================
+The PGF backend is now in matplotlib >= v1.2
+============================================
 
 This repository was the previous home of backend_pgf and won't be used for development or bugtracking anymore.
 
@@ -16,10 +16,6 @@ Using the ``pgf`` backend, matplotlib can export figures as pgf drawing commands
 ### Requirements
 
 The only requirement is an installed TeX distribution that includes `xelatex` and the `pgf` package (both found in [TeX Live](http://www.tug.org/texlive/) for example). The `xelatex` command must be in the system's path.
-
-### Downloading the module (pre matplotlib 1.2)
-
-If you are using a version of matplotlib older than 1.2 you first have to download `backend_pgf.py` from the matplotlib repository. The `download_backend.py` script will do this for you. Simply place the file `backend_pgf.py` in a directory that is in python's search path or right next to your plotting script.
 
 ### How to use it
 
